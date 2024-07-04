@@ -10,7 +10,8 @@ import {
   LogoutHook,
   SignHook,
   SignMessage,
-  SignMessageHook
+  SignMessageHook,
+  Swap
 } from 'pages';
 import { Send } from 'pages/Send/Send';
 import { Sign } from 'pages/Sign/Sign';
@@ -95,7 +96,12 @@ const routesObject: Record<RouteNamesEnum | HooksPageEnum, RouteWithTitleType> =
       path: HooksPageEnum.logout,
       title: 'Logout',
       component: LogoutHook
-    }
+    },
+    [RouteNamesEnum.swap]: {
+      path: RouteNamesEnum.swap,
+      title: 'Swap',
+      component: Swap
+    },
   };
 
 export const routes: RouteWithTitleType[] = Object.values(routesObject);

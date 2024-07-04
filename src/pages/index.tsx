@@ -8,3 +8,4 @@ export * from './Logout';
 export * from './Sign';
 export * from './Unlock';
 export * from './SignMessage';
+export * from './Swap';
