@@ -67,13 +67,15 @@ export const Swap = () => {
               <input
                 type='number'
                 placeholder='Amount'
-                className='bg-transparent pl-3 text-black flex-grow outline-none'
+                className='bg-transparent pl-3 text-black flex-grow outline-none no-arrows'
+                style={{ minWidth: '0' }}
               />
               <button className='bg-blue-500 text-white text-xs px-3 py-1 rounded-full ml-2'>
                 MAX
               </button>
               <div
-                className='ml-2 p-2 relative bg-white w-24 rounded-l-full'
+                className='ml-2 p-2 relative bg-white rounded-l-full'
+                style={{ flexShrink: 0 }}
                 ref={dropdownFromRef}
                 onClick={() => setDropdownOpenFrom(!dropdownOpenFrom)}
               >
@@ -116,7 +118,8 @@ export const Swap = () => {
               <input
                 type='number'
                 placeholder='Amount'
-                className='bg-transparent pl-3 text-black flex-grow outline-none'
+                className='bg-transparent pl-3 text-black flex-grow outline-none no-arrows'
+                style={{ minWidth: '0' }}
               />
               {selectedToToken !== 'Select...' && (
                 <button className='bg-blue-500 text-white text-xs px-3 py-1 rounded-full ml-2'>
@@ -124,7 +127,8 @@ export const Swap = () => {
                 </button>
               )}
               <div
-                className='ml-2 p-2 relative bg-white w-24 rounded-l-full'
+                className='ml-2 p-2 relative bg-white rounded-l-full'
+                style={{ flexShrink: 0 }}
                 ref={dropdownToRef}
                 onClick={() => setDropdownOpenTo(!dropdownOpenTo)}
               >
