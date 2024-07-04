@@ -17,8 +17,8 @@ export const Swap = () => {
     { name: 'Token3', logo: CnetLogo }
   ];
 
-  const dropdownFromRef = useRef(null);
-  const dropdownToRef = useRef(null);
+  const dropdownFromRef = useRef<HTMLDivElement>(null);
+  const dropdownToRef = useRef<HTMLDivElement>(null);
 
   const handleTokenSelectFrom = (token: { name: any; logo?: string }) => {
     setSelectedFromToken(token.name);
@@ -33,13 +33,13 @@ export const Swap = () => {
   const handleClickOutside = (event: MouseEvent) => {
     if (
       dropdownFromRef.current &&
-      !dropdownFromRef.current.contains(event.target)
+      !dropdownFromRef.current.contains(event.target as Node)
     ) {
       setDropdownOpenFrom(false);
     }
     if (
       dropdownToRef.current &&
-      !dropdownToRef.current.contains(event.target)
+      !dropdownToRef.current.contains(event.target as Node)
     ) {
       setDropdownOpenTo(false);
     }
@@ -63,7 +63,7 @@ export const Swap = () => {
               <span className='text-xs'>Swap From:</span>
               <span className='text-xs'>Balance: 0 {selectedFromToken}</span>
             </div>
-            <div className='flex items-center p-3 rounded-xl bg-gray-200'>
+            <div className='flex items-center p-3 rounded-xl bg-gray-100'>
               <input
                 type='number'
                 placeholder='Amount'
@@ -75,11 +75,9 @@ export const Swap = () => {
               <div
                 className='ml-2 p-2 relative bg-white w-24 rounded-l-full'
                 ref={dropdownFromRef}
+                onClick={() => setDropdownOpenFrom(!dropdownOpenFrom)}
               >
-                <button
-                  className='flex items-center'
-                  onClick={() => setDropdownOpenFrom(!dropdownOpenFrom)}
-                >
+                <button className='flex items-center'>
                   <img src={CnetLogo} alt='CNET' className='w-6 h-6 mr-2' />
                   <span>{selectedFromToken}</span>
                 </button>
@@ -114,7 +112,7 @@ export const Swap = () => {
               <span className='text-xs'>Swap To:</span>
               <span className='text-xs'>Balance: 0 {selectedToToken}</span>
             </div>
-            <div className='flex items-center p-3 rounded-xl bg-gray-200'>
+            <div className='flex items-center p-3 rounded-xl bg-gray-100'>
               <input
                 type='number'
                 placeholder='Amount'
@@ -128,11 +126,9 @@ export const Swap = () => {
               <div
                 className='ml-2 p-2 relative bg-white w-24 rounded-l-full'
                 ref={dropdownToRef}
+                onClick={() => setDropdownOpenTo(!dropdownOpenTo)}
               >
-                <button
-                  className='flex items-center'
-                  onClick={() => setDropdownOpenTo(!dropdownOpenTo)}
-                >
+                <button className='flex items-center'>
                   {selectedToToken === 'Select...' ? (
                     <span className='text-gray-500'>{selectedToToken}</span>
                   ) : (

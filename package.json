@@ -38,7 +38,7 @@
     "start": "tsc && npm run set-storage-persist && vite dev",
     "start-no-tsc": "npm run set-storage-persist && vite dev",
     "start:devnet": "tsc && npm run copy:devnet-config && npm run start",
-    "start:sovereign": "tsc && npm run copy:sovereign-config && npm run start",
+    "start:sovereign": "npm run copy:sovereign-config && tsc && npm run start",
     "start:testnet": "tsc && npm run copy:testnet-config && npm run start",
     "start:mainnet": "tsc && npm run copy:mainnet-config && npm run start",
     "build": "tsc && npm run set-storage-persist && vite build",
