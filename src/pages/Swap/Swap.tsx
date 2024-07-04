@@ -57,7 +57,7 @@ export const Swap = () => {
       <div className='flex flex-col gap-6'>
         <h2 className='text-2xl font-bold p-2 mb-2 text-center'>Swap</h2>
 
-        <div className='text-sm border border-gray-200 rounded-xl p-6 max-w-md mx-auto'>
+        <div className='text-sm border border-gray-200 rounded-xl p-6'>
           <div className='mb-6'>
             <div className='flex justify-between items-center mb-1 mx-1'>
               <span className='text-xs'>Swap From:</span>
