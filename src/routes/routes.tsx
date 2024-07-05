@@ -11,7 +11,8 @@ import {
   SignHook,
   SignMessage,
   SignMessageHook,
-  Swap
+  Swap,
+  Faucet
 } from 'pages';
 import { Send } from 'pages/Send/Send';
 import { Sign } from 'pages/Sign/Sign';
@@ -101,6 +102,11 @@ const routesObject: Record<RouteNamesEnum | HooksPageEnum, RouteWithTitleType> =
       path: RouteNamesEnum.swap,
       title: 'Swap',
       component: Swap
+    },
+    [RouteNamesEnum.faucet]: {
+      path: RouteNamesEnum.faucet,
+      title: 'Faucet',
+      component: Faucet
     },
   };
 

@@ -14,7 +14,8 @@ export enum RouteNamesEnum {
   logout = '/logout',
   sign = '/sign',
   signMessage = '/sign-message',
-  swap = '/swap'
+  swap = '/swap',
+  faucet = '/faucet'
 }
 
 export enum HooksPageEnum {

@@ -9,3 +9,6 @@ export * from './Sign';
 export * from './Unlock';
 export * from './SignMessage';
 export * from './Swap';
+export * from './Faucet';
+
+
