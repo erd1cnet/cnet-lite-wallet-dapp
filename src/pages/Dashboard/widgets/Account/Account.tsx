@@ -17,7 +17,7 @@ export const Account = () => {
 
   return (
     <div className='rounded-xl bg-gray-950 p-6 text-white sm:text-left'>
-      <div className='flex flex-col gap-6 sm:flex-row'>
+      <div className='flex flex-col gap-6 sm:flex-row pb-4'>
         <div className='flex grow flex-col gap-4 overflow-hidden'>
           <div className='overflow-hidden text-ellipsis text-xl font-medium xs:text-2xl'>
             Account
@@ -54,43 +54,6 @@ export const Account = () => {
               </div>
             </div>
           </div>
-          <div className='flex flex-row gap-4'>
-            <a
-              href={`${explorerAddress}/accounts/${address}`}
-              target='_blank'
-              className='inline-block rounded-lg bg-blue-600 px-4 py-2 text-sm text-white'
-            >
-              Open in Explorer
-            </a>
-            <MxLink
-              className='inline-block rounded-lg bg-blue-600 px-4 py-2 text-sm text-white'
-              data-testid={DataTestIdsEnum.sendBtn}
-              to={routeNames.send}
-            >
-              Send
-            </MxLink>
-            <MxLink
-              className='inline-block rounded-lg bg-blue-600 px-4 py-2 text-sm text-white'
-              data-testid={DataTestIdsEnum.sendBtn}
-              to={routeNames.signMessage}
-            >
-              Sign Message
-            </MxLink>
-            <MxLink
-              className='inline-block rounded-lg bg-blue-600 px-4 py-2 text-sm text-white'
-              data-testid={DataTestIdsEnum.sendBtn}
-              to={routeNames.swap}
-            >
-              Swap
-            </MxLink>
-            <MxLink
-              className='inline-block rounded-lg bg-blue-600 px-4 py-2 text-sm text-white'
-              data-testid={DataTestIdsEnum.sendBtn}
-              to={routeNames.faucet}
-            >
-              Faucet
-            </MxLink>
-          </div>
         </div>
         <div className='mb-2 hidden justify-center sm:block'>
           <QRCode
@@ -100,6 +63,43 @@ export const Account = () => {
             fgColor='#030712'
           />
         </div>
+      </div>
+      <div className='flex flex-wrap gap-2'>
+        <a
+          href={`${explorerAddress}/accounts/${address}`}
+          target='_blank'
+          className='inline-block rounded-lg bg-blue-600 px-4 py-2 text-xs text-white'
+        >
+          Open in Explorer
+        </a>
+        <MxLink
+          className='inline-block rounded-lg bg-blue-600 px-4 py-2 text-xs text-white'
+          data-testid={DataTestIdsEnum.sendBtn}
+          to={routeNames.send}
+        >
+          Send
+        </MxLink>
+        <MxLink
+          className='inline-block rounded-lg bg-blue-600 px-4 py-2 text-xs text-white'
+          data-testid={DataTestIdsEnum.sendBtn}
+          to={routeNames.signMessage}
+        >
+          Sign Message
+        </MxLink>
+        <MxLink
+          className='inline-block rounded-lg bg-blue-600 px-4 py-2 text-xs text-white'
+          data-testid={DataTestIdsEnum.sendBtn}
+          to={routeNames.swap}
+        >
+          Swap
+        </MxLink>
+        <MxLink
+          className='inline-block rounded-lg bg-blue-600 px-4 py-2 text-xs text-white'
+          data-testid={DataTestIdsEnum.sendBtn}
+          to={routeNames.faucet}
+        >
+          Faucet
+        </MxLink>
       </div>
     </div>
   );
