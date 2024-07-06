@@ -146,7 +146,7 @@ export const SignMessage = () => {
             id='closeButton'
             onClick={handleSignMessageCloseFlow}
           >
-            Cancel
+            « Back
           </Button>
         </div>
       </div>

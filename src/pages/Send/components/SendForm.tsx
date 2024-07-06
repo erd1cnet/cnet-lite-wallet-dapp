@@ -216,7 +216,7 @@ export const SendForm = () => {
           data-testid={DataTestIdsEnum.cancelBtn}
           to={routeNames.dashboard}
         >
-          Cancel
+          « Back
         </MxLink>
       </div>
     </form>
