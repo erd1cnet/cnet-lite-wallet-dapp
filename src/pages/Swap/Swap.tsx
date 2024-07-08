@@ -1,14 +1,24 @@
 import { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { MxLink } from 'components';
 import { DataTestIdsEnum } from 'localConstants';
 import { routeNames } from 'routes';
 import CnetLogo from '../../assets/img/cnet-logo.svg';
+import { useGetIsLoggedIn } from 'lib';
 
 export const Swap = () => {
+  const isLoggedIn = useGetIsLoggedIn();
   const [selectedFromToken, setSelectedFromToken] = useState('CNET');
   const [selectedToToken, setSelectedToToken] = useState('Select...');
   const [dropdownOpenFrom, setDropdownOpenFrom] = useState(false);
   const [dropdownOpenTo, setDropdownOpenTo] = useState(false);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!isLoggedIn) {
+      navigate(routeNames.unlock);
+    }
+  }, [isLoggedIn, navigate]);
 
   const tokens = [
     { name: 'CNET', logo: CnetLogo },
