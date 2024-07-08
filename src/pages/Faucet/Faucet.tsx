@@ -1,4 +1,7 @@
 import React, { useState } from 'react';
+import { MxLink } from 'components';
+import { DataTestIdsEnum } from 'localConstants';
+import { routeNames } from 'routes';
 import { GoogleReCaptchaProvider, useGoogleReCaptcha } from 'react-google-recaptcha-v3';
 import axios from 'axios';
 import { useGetAccountInfo } from 'lib';
@@ -60,6 +63,15 @@ const FaucetForm = () => {
             </button>
             {message && <p className='mt-4 text-center'>{message}</p>}
           </form>
+        </div>
+        <div className='mt-4 flex flex-col align-middle'>
+          <MxLink
+            className='block w-full mt-2 px-4 py-2 text-sm text-center text-blue-600'
+            data-testid={DataTestIdsEnum.cancelBtn}
+            to={routeNames.dashboard}
+          >
+            « Back
+          </MxLink>
         </div>
       </div>
     </div>
