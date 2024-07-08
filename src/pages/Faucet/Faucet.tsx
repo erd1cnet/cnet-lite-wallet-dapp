@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { GoogleReCaptchaProvider, useGoogleReCaptcha } from 'react-google-recaptcha-v3';
 import axios from 'axios';
+import { useGetAccountInfo } from 'lib';
 
 const FaucetForm = () => {
   const { executeRecaptcha } = useGoogleReCaptcha();
   const [message, setMessage] = useState<string | null>(null);
-  const address = "your-wallet-address-here";  // Cüzdan adresini burada ayarlayın
+  const { address } = useGetAccountInfo();
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -25,7 +26,11 @@ const FaucetForm = () => {
 
       setMessage(response.data.success ? 'Tokens sent successfully!' : response.data.error);
     } catch (error) {
-      setMessage('An error occurred. Please try again.');
+      if (axios.isAxiosError(error) && error.response) {
+        setMessage(error.response.data.error || 'An error occurred. Please try again.');
+      } else {
+        setMessage('An error occurred. Please try again.');
+      }
     }
   };
 
