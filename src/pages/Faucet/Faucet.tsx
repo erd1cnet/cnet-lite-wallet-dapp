@@ -1,38 +1,50 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { MxLink } from 'components';
 import { DataTestIdsEnum } from 'localConstants';
 import { routeNames } from 'routes';
 import { GoogleReCaptchaProvider, useGoogleReCaptcha } from 'react-google-recaptcha-v3';
 import axios from 'axios';
-import { useGetAccountInfo } from 'lib';
+import { useGetAccountInfo, useGetIsLoggedIn } from 'lib';
 
 const FaucetForm = () => {
+  const isLoggedIn = useGetIsLoggedIn();
   const { executeRecaptcha } = useGoogleReCaptcha();
   const [message, setMessage] = useState<string | null>(null);
   const { address } = useGetAccountInfo();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!isLoggedIn) {
+      navigate(routeNames.unlock);
+    }
+  }, [isLoggedIn, navigate]);
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
 
     if (!executeRecaptcha) {
-      setMessage('Recaptcha not yet available');
+      setMessage('Recaptcha henüz hazır değil');
       return;
     }
 
     const recaptchaToken = await executeRecaptcha('faucet');
 
     try {
-      const response = await axios.post('http://localhost:8000/faucet/', {
+      const response = await axios.post('https://testnet-extras-api.cyber.network/faucet/', {
         recaptcha: recaptchaToken,
         wallet_address: address,
+      }, {
+        withCredentials: true,
       });
 
-      setMessage(response.data.success ? 'Tokens sent successfully!' : response.data.error);
+      setMessage(response.data.success ? 'Tokenler başarıyla gönderildi!' : response.data.error);
+
     } catch (error) {
       if (axios.isAxiosError(error) && error.response) {
-        setMessage(error.response.data.error || 'An error occurred. Please try again.');
+        setMessage(error.response.data.error || 'Bir hata oluştu. Lütfen tekrar deneyin.');
       } else {
-        setMessage('An error occurred. Please try again.');
+        setMessage('Bir hata oluştu. Lütfen tekrar deneyin.');
       }
     }
   };
@@ -45,7 +57,7 @@ const FaucetForm = () => {
           <form onSubmit={handleSubmit}>
             <div className='mb-6'>
               <div className='flex justify-between items-center mb-1 mx-1'>
-                <span className='text-xs'>Wallet Address:</span>
+                <span className='text-xs'>Cüzdan Adresi:</span>
                 <span className='text-xs'>{address}</span>
               </div>
               <div className='flex items-center p-3 rounded-xl bg-gray-100'>
@@ -59,7 +71,7 @@ const FaucetForm = () => {
               </div>
             </div>
             <button className='w-full bg-blue-500 text-white py-3 rounded-md text-base' type="submit">
-              Get Tokens
+              Token Al
             </button>
             {message && <p className='mt-4 text-center'>{message}</p>}
           </form>
@@ -70,7 +82,7 @@ const FaucetForm = () => {
             data-testid={DataTestIdsEnum.cancelBtn}
             to={routeNames.dashboard}
           >
-            « Back
+            « Geri
           </MxLink>
         </div>
       </div>
