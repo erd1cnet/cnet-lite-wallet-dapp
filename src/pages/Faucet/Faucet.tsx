@@ -24,7 +24,7 @@ const FaucetForm = () => {
     event.preventDefault();
 
     if (!executeRecaptcha) {
-      setMessage('Recaptcha henüz hazır değil');
+      setMessage('Recaptcha is not ready yet');
       return;
     }
 
@@ -38,13 +38,13 @@ const FaucetForm = () => {
         withCredentials: true,
       });
 
-      setMessage(response.data.success ? 'Tokenler başarıyla gönderildi!' : response.data.error);
+      setMessage(response.data.success ? 'Tokens were sent successfully!' : response.data.error);
 
     } catch (error) {
       if (axios.isAxiosError(error) && error.response) {
-        setMessage(error.response.data.error || 'Bir hata oluştu. Lütfen tekrar deneyin.');
+        setMessage(error.response.data.error || 'An error occurred. Please try again.');
       } else {
-        setMessage('Bir hata oluştu. Lütfen tekrar deneyin.');
+        setMessage('An error occurred. Please try again.');
       }
     }
   };
@@ -57,7 +57,7 @@ const FaucetForm = () => {
           <form onSubmit={handleSubmit}>
             <div className='mb-6'>
               <div className='flex justify-between items-center mb-1 mx-1'>
-                <span className='text-xs'>Cüzdan Adresi:</span>
+                <span className='text-xs'>Wallet Address:</span>
                 <span className='text-xs'>{address}</span>
               </div>
               <div className='flex items-center p-3 rounded-xl bg-gray-100'>
@@ -71,7 +71,7 @@ const FaucetForm = () => {
               </div>
             </div>
             <button className='w-full bg-blue-500 text-white py-3 rounded-md text-base' type="submit">
-              Token Al
+              Get Tokens
             </button>
             {message && <p className='mt-4 text-center'>{message}</p>}
           </form>
@@ -82,7 +82,7 @@ const FaucetForm = () => {
             data-testid={DataTestIdsEnum.cancelBtn}
             to={routeNames.dashboard}
           >
-            « Geri
+            « Back
           </MxLink>
         </div>
       </div>
