@@ -87,7 +87,7 @@ export const useSignHookTransactions = () => {
       errorMessage: 'An error has occurred',
       submittedMessage: 'Success',
       processingMessage: 'Processing transactions',
-      transactionDuration: 10000
+      transactionDuration: 2000
     };
 
     const partialState = {
@@ -107,7 +107,7 @@ export const useSignHookTransactions = () => {
           errorMessage: 'An error has occurred',
           submittedMessage: 'Success',
           processingMessage: 'Processing transactions',
-          transactionDuration: 10000
+          transactionDuration: 2000
         },
         redirectAfterSign: false
       };

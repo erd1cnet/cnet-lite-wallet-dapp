@@ -97,7 +97,7 @@ export function useSendTransactions(redirectRoute?: string) {
         errorMessage: 'An error has occurred',
         submittedMessage: 'Success',
         processingMessage: 'Processing transactions',
-        transactionDuration: 10000
+        transactionDuration: 2000
       },
       redirectAfterSign: false
     };
