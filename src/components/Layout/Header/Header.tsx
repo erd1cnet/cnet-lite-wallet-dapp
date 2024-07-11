@@ -6,12 +6,7 @@ import { useMatch } from 'react-router-dom';
 import { MxLink } from 'components/MxLink';
 import { environment } from 'config';
 import { useGetIsLoggedIn } from 'lib';
-import { useGetAccountInfo } from 'lib';
 import { RouteNamesEnum } from 'localConstants';
-import {
-  explorerAddressSelector,
-  useSdkDappSelector
-} from 'redux/sdkDapp.store';
 import { routeNames } from 'routes';
 import MultiversXLogo from '../../../assets/img/cybernetwork-logo.svg?react';
 
@@ -20,8 +15,6 @@ export const Header = () => {
   const isLoggedIn = useGetIsLoggedIn();
   const isUnlockRoute = Boolean(useMatch(RouteNamesEnum.unlock));
   const isHomeRoute = Boolean(useMatch('/'));
-  const { address } = useGetAccountInfo();
-  const explorerAddress = useSdkDappSelector(explorerAddressSelector);
 
   const ConnectButton = !isUnlockRoute ? (
     <MxLink to={RouteNamesEnum.unlock}>
