@@ -1,9 +1,9 @@
+import React, { useState } from 'react';
 import {
   ExtensionLoginButton,
   LedgerLoginButton,
   OperaWalletLoginButton,
   WalletConnectLoginButton,
-  XaliasLoginButton
 } from 'components/sdkDapp.components';
 import { nativeAuth } from 'config';
 import { DataTestIdsEnum } from 'localConstants';
@@ -16,6 +16,7 @@ import {
 import { AuthRedirectWrapper } from 'wrappers';
 import { Keystore, Pem } from './components';
 import { useUnlockRedirect } from './hooks';
+import { CreateWallet } from '../CreateWallet';
 
 type CommonPropsType =
   | OperaWalletLoginButtonPropsType
@@ -23,6 +24,7 @@ type CommonPropsType =
   | WalletConnectLoginButtonPropsType;
 
 export const Unlock = () => {
+  const [showCreateWallet, setShowCreateWallet] = useState(false);
   const onUnlockRedirect = useUnlockRedirect();
 
   const commonProps: CommonPropsType = {
@@ -69,11 +71,31 @@ export const Unlock = () => {
           </div>
 
           <div className='flex flex-col md:flex-row'>
-            <p>asd</p>
+            <button 
+              className='w-full bg-blue-500 text-white py-3 rounded-md text-base'
+              onClick={() => setShowCreateWallet(true)}
+            >
+              Create Wallet
+            </button>
           </div>
-        </div>
 
+          {showCreateWallet && (
+            <div className='fixed inset-0 flex items-center justify-center bg-black bg-opacity-50'>
+              <div className='bg-white p-4 rounded shadow-md relative'>
+                <button 
+                  className='absolute top-0 right-0 m-4 text-black'
+                  onClick={() => setShowCreateWallet(false)}
+                >
+                  X
+                </button>
+                <CreateWallet />
+              </div>
+            </div>
+          )}
+        </div>
       </div>
     </AuthRedirectWrapper>
   );
 };
+
+export default Unlock;
