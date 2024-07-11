@@ -27,7 +27,7 @@ const FaucetForm = () => {
     event.preventDefault();
 
     if (!executeRecaptcha) {
-      setMessage('Recaptcha is not ready yet');
+      setMessage('reCAPTCHA is not ready yet');
       return;
     }
 
@@ -63,32 +63,19 @@ const FaucetForm = () => {
 
   return (
     <div className='flex flex-col p-6 max-w-2xl w-full bg-white shadow-md rounded h-full'>
-      <div className='flex flex-col gap-6'>
-        <h2 className='text-2xl font-bold p-2 mb-2 text-center'>Faucet</h2>
+      <div className='flex flex-col'>
+        <h2 className='text-2xl font-bold p-2 text-center'>xCNET Faucet</h2>
+        <p className='text-gray-400 text-center mb-8'>You can request 1000 xCNET every 24 hours</p>
         <div className='text-sm border border-gray-200 rounded-xl p-6'>
           <form onSubmit={handleSubmit}>
-            <div className='mb-6'>
-              <div className='flex justify-between items-center mb-1 mx-1'>
-                <span className='text-xs'>Wallet Address:</span>
-                <span className='text-xs'>{address}</span>
-              </div>
-              <div className='flex items-center p-3 rounded-xl bg-gray-100'>
-                <input
-                  type='text'
-                  value={address}
-                  readOnly
-                  className='bg-transparent pl-3 text-black flex-grow outline-none'
-                  style={{ minWidth: '0' }}
-                />
-              </div>
+            <div className='mb-4'>
+              <div className='text-sm text-gray-400'>Your address:</div>
+              <div className='overflow-hidden break-all text-sm'>{address}</div>
             </div>
-            <button
-              className='w-full bg-blue-500 text-white py-3 rounded-md text-base'
-              type='submit'
-            >
-              Get Tokens
+            <button className='w-full rounded-lg bg-blue-600 hover:bg-blue-700 px-4 py-3 text-white text-base' type='submit'>
+              Request Tokens
             </button>
-            {message && <p className='mt-4 text-center'>{message}</p>}
+            <p className='mt-2 text-center'>{message}</p>
           </form>
         </div>
         <div className='mt-4 flex flex-col align-middle'>

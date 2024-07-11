@@ -85,8 +85,8 @@ export const Unlock = () => {
           </div>
 
           {showCreateWallet && (
-            <div className='fixed inset-0 flex items-center justify-center bg-black bg-opacity-50'>
-              <div className='bg-white p-4 rounded shadow-md relative'>
+            <div className='fixed inset-0 flex items-center justify-center shadow-lg bg-black bg-opacity-40'>
+              <div className='bg-white p-4 rounded shadow-md relative max-w-screen-sm w-full mx-4'>
                 <button
                   className='absolute top-0 right-0 m-4 text-black'
                   onClick={() => setShowCreateWallet(false)}

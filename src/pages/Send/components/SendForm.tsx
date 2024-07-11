@@ -205,7 +205,7 @@ export const SendForm = () => {
       </div>
       <div className='mt-4 flex flex-col align-middle'>
         <Button
-          className='mt-4 mx-auto rounded-lg bg-blue-600 px-4 py-2 text-sm text-white'
+          className='mt-3 w-full rounded-lg bg-blue-600 hover:bg-blue-700 px-4 py-3 text-white text-base'
           data-testid={DataTestIdsEnum.sendBtn}
           type='submit'
         >

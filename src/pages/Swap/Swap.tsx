@@ -64,9 +64,9 @@ export const Swap = () => {
 
   return (
     <div className='flex flex-col p-6 max-w-2xl w-full bg-white shadow-md rounded h-full'>
-      <div className='flex flex-col gap-6'>
-        <h2 className='text-2xl font-bold p-2 mb-2 text-center'>Swap</h2>
-
+      <div className='flex flex-col'>
+      <h2 className='text-2xl font-bold p-2 text-center'>Swap</h2>
+      <p className='text-gray-400 text-center mb-8'>Trade tokens in an instant</p>
         <div className='text-sm border border-gray-200 rounded-xl p-6'>
           <div className='mb-6'>
             <div className='flex justify-between items-center mb-1 mx-1'>
@@ -173,8 +173,7 @@ export const Swap = () => {
               </div>
             </div>
           </div>
-
-          <button className='w-full bg-blue-500 text-white py-3 rounded-md text-base'>
+          <button className='w-full rounded-lg bg-blue-600 hover:bg-blue-700 px-4 py-3 text-white text-base'>
             Swap
           </button>
         </div>

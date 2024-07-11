@@ -95,10 +95,9 @@ export const SignMessage = () => {
       className='flex flex-col p-6 max-w-2xl w-full bg-white shadow-md rounded h-full'
       data-testid={DataTestIdsEnum.signMessagePage}
     >
-      <div className='flex flex-col gap-6'>
-        <h2 className='text-2xl font-bold p-2 mb-2 text-center'>
-          Sign Message
-        </h2>
+      <div className='flex flex-col'>
+      <h2 className='text-2xl font-bold p-2 text-center'>Sign Message</h2>
+      <p className='text-gray-400 text-center mb-8'>Type in the message that you would like to sign</p>
         <OutputContainer>
           {!isSuccess && !isError && (
             <textarea
@@ -116,11 +115,11 @@ export const SignMessage = () => {
 
           {isError && <SignFailure />}
         </OutputContainer>
-        <div className='my-2 flex flex-col gap-4'>
+        <div className='my-2 flex flex-col gap-4 mt-6'>
           {isSuccess || isError ? (
             <Button
               data-testid={DataTestIdsEnum.cancelSignMessageBtn}
-              className='mx-auto rounded-lg bg-blue-600 px-4 py-2 text-sm text-white'
+              className='w-full rounded-lg bg-blue-600 hover:bg-blue-700 px-4 py-3 text-white text-base'
               id='closeButton'
               onClick={handleSignMessageCloseFlow}
             >
@@ -132,7 +131,7 @@ export const SignMessage = () => {
             </Button>
           ) : (
             <Button
-              className='mx-auto rounded-lg bg-blue-600 px-4 py-2 text-sm text-white'
+              className='w-full rounded-lg bg-blue-600 hover:bg-blue-700 px-4 py-3 text-white text-base'
               data-testid={DataTestIdsEnum.signMessageBtn}
               onClick={handleSubmit}
             >

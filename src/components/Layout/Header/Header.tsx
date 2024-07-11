@@ -29,7 +29,7 @@ export const Header = () => {
 
   return (
     <nav className='bg-white border-gray-200'>
-      <div className='max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4'>
+      <div className='max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4 min-h-[72px]'>
         <MxLink
           to={isLoggedIn ? routeNames.dashboard : routeNames.home}
           className='flex items-center space-x-3'
@@ -37,7 +37,7 @@ export const Header = () => {
           <MultiversXLogo className='h-8' />
           <div className='flex gap-1 items-center'>
             <div className='w-2 h-2 rounded-full bg-green-500' />
-            <p className='text-gray-600 text-sm'>{environment}</p>
+            <p className='text-gray-600 text-xs'>{environment}</p>
           </div>
         </MxLink>
         <div className='flex md:order-2 space-x-3 md:space-x-0'>

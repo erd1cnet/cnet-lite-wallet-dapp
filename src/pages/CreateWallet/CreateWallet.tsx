@@ -3,12 +3,13 @@ import React, { useState } from 'react';
 import { Address } from '@multiversx/sdk-core';
 import { UserWallet, Mnemonic, UserSecretKey } from '@multiversx/sdk-wallet';
 import { useNavigate } from 'react-router-dom';
+import { faCopy } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { routeNames } from 'routes';
 
-const createKeystoreFromMnemonic = async (password: string) => {
+const createKeystoreFromMnemonic = async (mnemonic: string, password: string) => {
   try {
-    const mnemonicService = Mnemonic.generate();
-    const mnemonic = mnemonicService.toString();
+    const mnemonicService = Mnemonic.fromString(mnemonic);
     const secretKey: UserSecretKey = mnemonicService.deriveKey();
 
     const randomness = {
@@ -28,7 +29,6 @@ const createKeystoreFromMnemonic = async (password: string) => {
 
     const keystoreJSON = userWallet.toJSON();
     return {
-      mnemonic,
       address: address.bech32(),
       keystore: keystoreJSON
     };
@@ -38,10 +38,25 @@ const createKeystoreFromMnemonic = async (password: string) => {
   }
 };
 
+const ProgressBar: React.FC<{ step: number }> = ({ step }) => {
+  const progress = (step / 4) * 100;
+
+  return (
+    <div className='w-full bg-gray-200 rounded-full h-2.5 mb-4'>
+      <div
+        className='bg-blue-500 h-2.5 rounded-full'
+        style={{ width: `${progress}%` }}
+      ></div>
+    </div>
+  );
+};
+
 export const CreateWallet: React.FC = () => {
   const navigate = useNavigate();
   const [password, setPassword] = useState<string>('');
-  const [mnemonic, setMnemonic] = useState<string>('');
+  const [confirmPassword, setConfirmPassword] = useState<string>('');
+  const [passwordError, setPasswordError] = useState<string>('');
+  const [mnemonic, setMnemonic] = useState<string>(Mnemonic.generate().toString());
   const [walletAddress, setWalletAddress] = useState<string>('');
   const [keystore, setKeystore] = useState<string>('');
   const [verificationWords, setVerificationWords] = useState<
@@ -55,22 +70,21 @@ export const CreateWallet: React.FC = () => {
   const [isVerificationPhase, setIsVerificationPhase] =
     useState<boolean>(false);
   const [isVerified, setIsVerified] = useState<boolean>(false);
+  const [isPasswordPhase, setIsPasswordPhase] = useState<boolean>(false);
+  const [isWalletCreated, setIsWalletCreated] = useState<boolean>(false);
+  const [showCreateWallet, setShowCreateWallet] = useState<boolean>(true);
 
   const handleCreateWallet = async () => {
+    if (password !== confirmPassword) {
+      setPasswordError('Passwords do not match. Please try again.');
+      return;
+    }
+    setPasswordError('');
     try {
-      const result = await createKeystoreFromMnemonic(password);
-      setMnemonic(result.mnemonic);
+      const result = await createKeystoreFromMnemonic(mnemonic, password);
       setWalletAddress(result.address);
       setKeystore(JSON.stringify(result.keystore, null, 2));
-
-      // Rastgele 3 kelime seç
-      const words = result.mnemonic.split(' ');
-      const randomIndices = Array.from({ length: 3 }, () =>
-        Math.floor(Math.random() * 24)
-      );
-      setVerificationWords(
-        randomIndices.map((index) => ({ index, word: words[index] }))
-      );
+      setIsWalletCreated(true);
     } catch (error) {
       console.error('Error creating keystore:', error);
     }
@@ -81,17 +95,13 @@ export const CreateWallet: React.FC = () => {
   };
 
   const handleVerify = () => {
-    let isValid = true;
-    for (const { index, word } of verificationWords) {
-      if (verificationInput[index] !== word) {
-        isValid = false;
-        break;
-      }
-    }
+    const isValid = verificationWords.every(
+      ({ index, word }) => verificationInput[index] === word
+    );
 
     if (isValid) {
-      downloadKeystore();
       setIsVerified(true);
+      setIsPasswordPhase(true);
     } else {
       setVerificationError('Mnemonic words do not match. Please try again.');
     }
@@ -110,119 +120,172 @@ export const CreateWallet: React.FC = () => {
     navigator.clipboard.writeText(text);
   };
 
+  const formattedMnemonic = mnemonic.split(' ').map((word, index) => `${index + 1} ${word}`).join('\n');
+  const sortedMnemonicWords = mnemonic.split(' ').sort();
+
+  if (!showCreateWallet) {
+    return null; // or render another component/page
+  }
+
   return (
-    <div className='flex flex-col p-6 max-w-2xl w-full bg-white shadow-md rounded h-full'>
-      <div className='flex flex-col gap-6'>
-        <h2 className='text-2xl font-bold p-2 mb-2 text-center'>
-          Create Wallet
-        </h2>
-        <div className='text-sm border border-gray-200 rounded-xl p-6'>
-          {!isVerificationPhase ? (
-            <>
-              <div className='mb-6'>
-                <div className='flex flex-col mb-4'>
-                  <label className='text-xs mb-2'>Password:</label>
-                  <input
-                    type='password'
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder='Enter your password'
-                    className='bg-gray-100 p-3 rounded-xl outline-none'
-                  />
-                </div>
+    <div className='flex flex-col p-6'>
+      <ProgressBar step={isWalletCreated ? 4 : isPasswordPhase ? 3 : isVerificationPhase ? 2 : 1} />
+      {!isVerificationPhase && !isPasswordPhase ? (
+        <>
+          <h2 className='text-2xl font-bold p-2 text-center'>Create Wallet</h2>
+          <p className='text-gray-400 text-center mb-8'>Write down these words in this exact order. You can use them to access your wallet, make sure you protect them.</p>
+          <div className='text-sm border border-gray-200 rounded-xl p-6'>
+            <div className='mb-6'>
+              <div className='grid grid-cols-4 gap-2'>
+                {mnemonic.split(' ').map((word, index) => (
+                  <div key={index} className='p-2 bg-gray-200 rounded'>
+                    {index + 1} {word}
+                  </div>
+                ))}
               </div>
               <button
-                onClick={handleCreateWallet}
-                className='w-full bg-blue-500 text-white py-3 rounded-md text-base'
+                onClick={() => copyToClipboard(formattedMnemonic)}
+                className='bg-yellow-600 hover:bg-yellow-700 text-white py-1 px-4 rounded-md my-5 mx-auto block'
               >
-                Create a new wallet
+                Copy Mnemonic
               </button>
-              {mnemonic && (
-                <div className='mt-4'>
-                  <h3 className='text-lg font-bold'>Mnemonic:</h3>
-                  <p>{mnemonic}</p>
-                  <button
-                    onClick={() => copyToClipboard(mnemonic)}
-                    className='w-full bg-yellow-500 text-white py-3 rounded-md text-base mt-2'
-                  >
-                    Copy Mnemonic
-                  </button>
-                </div>
-              )}
-              {mnemonic && (
-                <div className='mt-4'>
-                  <label className='flex items-center'>
-                    <input
-                      type='checkbox'
-                      checked={isAcknowledged}
-                      onChange={(e) => setIsAcknowledged(e.target.checked)}
-                      className='mr-2'
-                    />
-                    <span>
-                      I acknowledge that if I lose my mnemonic, my wallet cannot
-                      be recovered.
-                    </span>
-                  </label>
-                  <button
-                    onClick={() => setIsVerificationPhase(true)}
-                    className='w-full bg-green-500 text-white py-3 rounded-md text-base mt-2'
-                    disabled={!isAcknowledged}
-                  >
-                    Proceed to Verification
-                  </button>
-                </div>
-              )}
-            </>
-          ) : (
-            <>
-              {!isVerified ? (
-                <>
-                  <h3 className='text-lg font-bold'>Verify Mnemonic</h3>
-                  <p>Please enter the following words from your mnemonic:</p>
-                  {verificationWords.map(({ index }) => (
-                    <div key={index} className='mb-2'>
-                      <label className='text-xs mb-1'>Word #{index + 1}</label>
-                      <input
-                        type='text'
-                        value={verificationInput[index] || ''}
-                        onChange={(e) =>
-                          handleVerificationInput(index, e.target.value)
-                        }
-                        className='bg-gray-100 p-2 rounded-xl outline-none'
-                      />
-                    </div>
+              <div className='mt-4'>
+              <label className='flex items-center'>
+                  <input
+                    type='checkbox'
+                    checked={isAcknowledged}
+                    onChange={(e) => setIsAcknowledged(e.target.checked)}
+                    className='mr-2'
+                  />
+                  <span>
+                    I acknowledge that if I lose my mnemonic, my wallet cannot
+                    be recovered.
+                  </span>
+                </label>
+                <button
+                  onClick={() => {
+                    const words = mnemonic.split(' ');
+                    const randomIndices = Array.from({ length: 3 }, () =>
+                      Math.floor(Math.random() * 24)
+                    );
+                    setVerificationWords(
+                      randomIndices.map((index) => ({ index, word: words[index] }))
+                    );
+                    setIsVerificationPhase(true);
+                  }}
+                  className='w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-md text-base mt-2'
+                  disabled={!isAcknowledged}
+                >
+                  Proceed to Verification
+                </button>
+              </div>
+            </div>
+          </div>
+        </>
+      ) : !isVerified ? (
+        <>
+          <h2 className='text-2xl font-bold p-2 text-center'>Surprise Quiz</h2>
+          <p className='text-gray-400 text-center mb-8'>Enter the words from your Secret Phrase as indicated below.</p>
+          <div className='text-sm border border-gray-200 rounded-xl p-6'>
+            {verificationWords.map(({ index, word }) => (
+              <div key={index} className='mb-6'>
+                <label className='text-xs mb-1 block'>Word {index + 1}</label>
+                <input
+                  list={`wordlist-${index}`}
+                  type='text'
+                  value={verificationInput[index] || ''}
+                  onChange={(e) =>
+                    handleVerificationInput(index, e.target.value)
+                  }
+                  className='bg-gray-100 p-2 rounded-xl outline-none w-full'
+                />
+                <datalist id={`wordlist-${index}`}>
+                  {sortedMnemonicWords.map((mnemonicWord, idx) => (
+                    <option key={idx} value={mnemonicWord} />
                   ))}
-                  {verificationError && (
-                    <p className='text-red-500'>{verificationError}</p>
-                  )}
-                  <button
-                    onClick={handleVerify}
-                    className='w-full bg-green-500 text-white py-3 rounded-md text-base mt-2'
-                  >
-                    Verify and Download Keystore
-                  </button>
-                </>
-              ) : (
-                <div className='text-center'>
-                  <div className='text-6xl text-green-500'>✓</div>
-                  <h3 className='text-lg font-bold mt-4'>
-                    Wallet Created Successfully!
-                  </h3>
-                  <p className='mt-2'>
-                    Your wallet is ready. Enjoy the world of blockchain!
-                  </p>
-                  <button
-                    onClick={() => navigate(routeNames.unlock)}
-                    className='w-full bg-blue-500 text-white py-3 rounded-md text-base mt-4'
-                  >
-                    Go to Unlock
-                  </button>
-                </div>
+                </datalist>
+              </div>
+            ))}
+            {verificationError && (
+              <p className='text-red-500'>{verificationError}</p>
+            )}
+            <button
+              onClick={handleVerify}
+              className='w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-md text-base mt-2'
+            >
+              Verify
+            </button>
+            <button
+              onClick={() => setIsVerificationPhase(false)}
+              className='text-green text-base mt-4 mx-auto block'
+            >
+              Back to words
+            </button>
+          </div>
+        </>
+      ) : !isWalletCreated ? (
+        <>
+          <h2 className='text-2xl font-bold p-2 text-center'>Awesome, now create a password</h2>
+          <p className='text-gray-400 text-center mb-8'>The wallet made a secret key for you and stored it in a file. <br />Protect your Keystore File with a password.</p>
+          <div className='text-sm border border-gray-200 rounded-xl p-6'>
+            <div className='mb-6'>
+              <div className='flex flex-col mb-4'>
+                <label className='text-xs mb-2'>Password</label>
+                <input
+                  type='password'
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className='bg-gray-100 p-3 rounded-xl outline-none'
+                />
+              </div>
+              <div className='flex flex-col mb-4'>
+                <label className='text-xs mb-2'>Confirm Password</label>
+                <input
+                  type='password'
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  className='bg-gray-100 p-3 rounded-xl outline-none'
+                />
+              </div>
+              {passwordError && (
+                <p className='text-red-500'>{passwordError}</p>
               )}
-            </>
-          )}
-        </div>
-      </div>
+            </div>
+            <button
+              onClick={handleCreateWallet}
+              className='w-full bg-blue-500 text-white py-3 rounded-md text-base'
+            >
+              Create Wallet
+            </button>
+          </div>
+        </>
+      ) : (
+        <>
+          <h2 className='text-2xl font-bold p-2 text-center'>Wallet Created</h2>
+          <p className='text-gray-400 text-center mb-8'>Your wallet is ready. Enjoy the world of blockchain!</p>
+          <div className='text-sm border border-gray-200 rounded-xl p-6 text-center'>
+            <div className='text-6xl text-green-500'>✓</div>
+            <h3 className='text-lg font-bold mt-4'>
+              Wallet created!
+            </h3>
+            <p className='mt-2'>
+              Great work. You downloaded the keystore file. <br />Save it, you’ll need it to access your wallet.
+            </p>
+            <button
+              onClick={() => setShowCreateWallet(false)}
+              className='w-full bg-blue-500 text-white py-3 rounded-md text-base mt-5'
+            >
+              Access Wallet
+            </button>
+            <button
+              onClick={downloadKeystore}
+              className='text-green text-base mt-4'
+            >
+              Download keystore file again
+            </button>
+          </div>
+        </>
+      )}
     </div>
   );
 };
