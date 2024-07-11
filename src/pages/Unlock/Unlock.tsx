@@ -44,7 +44,7 @@ export const Unlock = () => {
             <p className='text-center text-gray-400'>Choose a login method</p>
           </div>
 
-          <div className='flex flex-col md:flex-row'>
+          <div className='flex flex-col md:flex-row pb-5'>
             <WalletConnectLoginButton
               loginButtonText='xPortal App'
               {...commonProps}
@@ -68,7 +68,17 @@ export const Unlock = () => {
             <Pem />
             <Keystore />
           </div>
+
+          <div className='flex flex-col items-center gap-1 pt-5'>
+            <h2 className='text-2xl'>Create Wallet</h2>
+            <p className='text-center text-gray-400'>Create your non-custodial wallet</p>
+          </div>
+
+          <div className='flex flex-col md:flex-row'>
+            <p>asd</p>
+          </div>
         </div>
+
       </div>
     </AuthRedirectWrapper>
   );
