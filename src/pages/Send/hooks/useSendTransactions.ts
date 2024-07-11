@@ -66,7 +66,8 @@ export function useSendTransactions(redirectRoute?: string) {
       transactionsDisplayInfo: {
         successMessage: 'Transactions successfully sent',
         submittedMessage: 'Success',
-        processingMessage: 'Processing transactions'
+        processingMessage: 'Processing transactions',
+        transactionDuration: 1000
       },
       redirectAfterSign: false
     };
@@ -97,7 +98,7 @@ export function useSendTransactions(redirectRoute?: string) {
         errorMessage: 'An error has occurred',
         submittedMessage: 'Success',
         processingMessage: 'Processing transactions',
-        transactionDuration: 2000
+        transactionDuration: 10000
       },
       redirectAfterSign: false
     };
