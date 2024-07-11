@@ -1,5 +1,7 @@
+import { faExternalLink } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import QRCode from 'react-qr-code';
-import { Copy, MxLink } from 'components';
+import { Copy } from 'components';
 import { FormatAmount } from 'components/sdkDapp.components';
 import { useGetAccountInfo, useGetNetworkConfig } from 'lib';
 import { DataTestIdsEnum } from 'localConstants';
@@ -7,7 +9,6 @@ import {
   explorerAddressSelector,
   useSdkDappSelector
 } from 'redux/sdkDapp.store';
-import { routeNames } from 'routes';
 
 export const Account = () => {
   const { network } = useGetNetworkConfig();
@@ -41,7 +42,9 @@ export const Account = () => {
             />
           </div>
           <div>
-            <div className='text-sm text-gray-400'>Your balance:</div>
+            <div className='text-sm text-gray-400 sm:text-left text-center'>
+              Your balance:
+            </div>
             <div className='flex items-center justify-center sm:justify-start'>
               <div className='flex items-center justify-start gap-2 '>
                 <span className='text-xl'>
@@ -64,42 +67,15 @@ export const Account = () => {
           />
         </div>
       </div>
-      <div className='flex flex-wrap gap-2'>
+      <div className='flex flex-wrap gap-2 sm:justify-start justify-center'>
         <a
           href={`${explorerAddress}/accounts/${address}`}
           target='_blank'
-          className='inline-block rounded-lg bg-blue-600 px-4 py-2 text-xs text-white'
+          className='flex items-center rounded-lg bg-blue-600 hover:bg-blue-700 px-4 py-2 text-white'
         >
-          Open in Explorer
+          Open in Explorer{' '}
+          <FontAwesomeIcon className='pl-2' icon={faExternalLink} />
         </a>
-        <MxLink
-          className='inline-block rounded-lg bg-blue-600 px-4 py-2 text-xs text-white'
-          data-testid={DataTestIdsEnum.sendBtn}
-          to={routeNames.send}
-        >
-          Send
-        </MxLink>
-        <MxLink
-          className='inline-block rounded-lg bg-blue-600 px-4 py-2 text-xs text-white'
-          data-testid={DataTestIdsEnum.sendBtn}
-          to={routeNames.signMessage}
-        >
-          Sign Message
-        </MxLink>
-        <MxLink
-          className='inline-block rounded-lg bg-blue-600 px-4 py-2 text-xs text-white'
-          data-testid={DataTestIdsEnum.sendBtn}
-          to={routeNames.swap}
-        >
-          Swap
-        </MxLink>
-        <MxLink
-          className='inline-block rounded-lg bg-blue-600 px-4 py-2 text-xs text-white'
-          data-testid={DataTestIdsEnum.sendBtn}
-          to={routeNames.faucet}
-        >
-          Faucet
-        </MxLink>
       </div>
     </div>
   );

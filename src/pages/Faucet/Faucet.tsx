@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import {
+  GoogleReCaptchaProvider,
+  useGoogleReCaptcha
+} from 'react-google-recaptcha-v3';
 import { useNavigate } from 'react-router-dom';
 import { MxLink } from 'components';
+import { useGetAccountInfo, useGetIsLoggedIn } from 'lib';
 import { DataTestIdsEnum } from 'localConstants';
 import { routeNames } from 'routes';
-import { GoogleReCaptchaProvider, useGoogleReCaptcha } from 'react-google-recaptcha-v3';
-import axios from 'axios';
-import { useGetAccountInfo, useGetIsLoggedIn } from 'lib';
 
 const FaucetForm = () => {
   const isLoggedIn = useGetIsLoggedIn();
@@ -31,18 +34,27 @@ const FaucetForm = () => {
     const recaptchaToken = await executeRecaptcha('faucet');
 
     try {
-      const response = await axios.post('https://testnet-extras-api.cyber.network/faucet/', {
-        recaptcha: recaptchaToken,
-        wallet_address: address,
-      }, {
-        withCredentials: true,
-      });
+      const response = await axios.post(
+        'https://testnet-extras-api.cyber.network/faucet/',
+        {
+          recaptcha: recaptchaToken,
+          wallet_address: address
+        },
+        {
+          withCredentials: true
+        }
+      );
 
-      setMessage(response.data.success ? 'Tokens were sent successfully!' : response.data.error);
-
+      setMessage(
+        response.data.success
+          ? 'Tokens were sent successfully!'
+          : response.data.error
+      );
     } catch (error) {
       if (axios.isAxiosError(error) && error.response) {
-        setMessage(error.response.data.error || 'An error occurred. Please try again.');
+        setMessage(
+          error.response.data.error || 'An error occurred. Please try again.'
+        );
       } else {
         setMessage('An error occurred. Please try again.');
       }
@@ -70,7 +82,10 @@ const FaucetForm = () => {
                 />
               </div>
             </div>
-            <button className='w-full bg-blue-500 text-white py-3 rounded-md text-base' type="submit">
+            <button
+              className='w-full bg-blue-500 text-white py-3 rounded-md text-base'
+              type='submit'
+            >
               Get Tokens
             </button>
             {message && <p className='mt-4 text-center'>{message}</p>}
@@ -92,7 +107,7 @@ const FaucetForm = () => {
 
 export const Faucet = () => {
   return (
-    <GoogleReCaptchaProvider reCaptchaKey="6LeUHQkqAAAAACqtboSbrGrSWoTTH49TvCK3SyNK">
+    <GoogleReCaptchaProvider reCaptchaKey='6LeUHQkqAAAAACqtboSbrGrSWoTTH49TvCK3SyNK'>
       <FaucetForm />
     </GoogleReCaptchaProvider>
   );

@@ -1,9 +1,11 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
+import { faAdd } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   ExtensionLoginButton,
   LedgerLoginButton,
   OperaWalletLoginButton,
-  WalletConnectLoginButton,
+  WalletConnectLoginButton
 } from 'components/sdkDapp.components';
 import { nativeAuth } from 'config';
 import { DataTestIdsEnum } from 'localConstants';
@@ -67,22 +69,25 @@ export const Unlock = () => {
 
           <div className='flex flex-col items-center gap-1 pt-5'>
             <h2 className='text-2xl'>Create Wallet</h2>
-            <p className='text-center text-gray-400'>Create your non-custodial wallet</p>
+            <p className='text-center text-gray-400'>
+              Create your non-custodial wallet
+            </p>
           </div>
 
           <div className='flex flex-col md:flex-row'>
-            <button 
-              className='w-full bg-blue-500 text-white py-3 rounded-md text-base'
+            <button
+              className='flex items-center rounded-lg px-4 py-2 bg-green-600 hover:bg-green-700 text-white'
               onClick={() => setShowCreateWallet(true)}
             >
-              Create Wallet
+              Create a new wallet{' '}
+              <FontAwesomeIcon className='pl-2' icon={faAdd} />
             </button>
           </div>
 
           {showCreateWallet && (
             <div className='fixed inset-0 flex items-center justify-center bg-black bg-opacity-50'>
               <div className='bg-white p-4 rounded shadow-md relative'>
-                <button 
+                <button
                   className='absolute top-0 right-0 m-4 text-black'
                   onClick={() => setShowCreateWallet(false)}
                 >
