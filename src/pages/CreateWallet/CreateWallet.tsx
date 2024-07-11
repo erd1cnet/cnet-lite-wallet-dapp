@@ -2,10 +2,6 @@ import { Buffer } from 'buffer';
 import React, { useState } from 'react';
 import { Address } from '@multiversx/sdk-core';
 import { UserWallet, Mnemonic, UserSecretKey } from '@multiversx/sdk-wallet';
-import { useNavigate } from 'react-router-dom';
-import { faCopy } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { routeNames } from 'routes';
 
 const createKeystoreFromMnemonic = async (mnemonic: string, password: string) => {
   try {
@@ -52,11 +48,10 @@ const ProgressBar: React.FC<{ step: number }> = ({ step }) => {
 };
 
 export const CreateWallet: React.FC = () => {
-  const navigate = useNavigate();
   const [password, setPassword] = useState<string>('');
   const [confirmPassword, setConfirmPassword] = useState<string>('');
   const [passwordError, setPasswordError] = useState<string>('');
-  const [mnemonic, setMnemonic] = useState<string>(Mnemonic.generate().toString());
+  const [mnemonic] = useState<string>(Mnemonic.generate().toString());
   const [walletAddress, setWalletAddress] = useState<string>('');
   const [keystore, setKeystore] = useState<string>('');
   const [verificationWords, setVerificationWords] = useState<
@@ -187,7 +182,7 @@ export const CreateWallet: React.FC = () => {
           <h2 className='text-2xl font-bold p-2 text-center'>Surprise Quiz</h2>
           <p className='text-gray-400 text-center mb-8'>Enter the words from your Secret Phrase as indicated below.</p>
           <div className='text-sm border border-gray-200 rounded-xl p-6'>
-            {verificationWords.map(({ index, word }) => (
+            {verificationWords.map(({ index }) => (
               <div key={index} className='mb-6'>
                 <label className='text-xs mb-1 block'>Word {index + 1}</label>
                 <input
