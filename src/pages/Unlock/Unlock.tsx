@@ -59,12 +59,6 @@ export const Unlock = () => {
               {...commonProps}
             />
 
-            <XaliasLoginButton
-              loginButtonText='xAlias'
-              data-testid='xAliasLoginBtn'
-              {...commonProps}
-            />
-
             <Pem />
             <Keystore />
           </div>
