@@ -1,5 +1,9 @@
 import { MouseEvent } from 'react';
-import { faArrowUp, faCoins } from '@fortawesome/free-solid-svg-icons';
+import {
+  faArrowUp,
+  faCoins,
+  faArrowDown
+} from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useNavigate } from 'react-router-dom';
 import { FormatAmount } from 'components';
@@ -32,18 +36,33 @@ export const TokenRow = ({ token }: { token: TokenType }) => {
         )}
         <div>{token.ticker}</div>
       </div>
-      <div className='flex items-center space-x-4'>
+      <div className='flex items-center space-x-2'>
         {token.balance && (
           <div className='text-right'>
             <FormatAmount value={token.balance} showLabel={false} />
           </div>
         )}
         <button
-          className='text-white rounded bg-blue-600 px-2 py-1'
+          className='text-white rounded bg-red-600 hover:bg-red-700 px-2 py-1'
           data-testid={`send-${token.identifier}`}
           onClick={handleSend}
         >
           <FontAwesomeIcon icon={faArrowUp} />
+        </button>
+        <button
+          className='text-white rounded bg-blue-600 hover:bg-blue-700 px-2 py-1'
+          data-testid={`send-${token.identifier}`}
+          onClick={handleSend}
+        >
+          Unwrap
+        </button>
+        <button
+          className='text-white rounded bg-green-600 hover:bg-green-700 px-2 py-1'
+          data-testid={`send-${token.identifier}`}
+          onClick={handleSend}
+        >
+          <FontAwesomeIcon icon={faArrowUp} />{' '}
+          <FontAwesomeIcon icon={faArrowDown} />
         </button>
       </div>
     </div>
