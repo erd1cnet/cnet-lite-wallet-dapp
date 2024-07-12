@@ -3,15 +3,24 @@ import { useNavigate } from 'react-router-dom';
 import { MxLink } from 'components';
 import { DataTestIdsEnum } from 'localConstants';
 import { routeNames } from 'routes';
-import CnetLogo from '../../assets/img/cnet-logo.svg';
-import { useGetIsLoggedIn } from 'lib';
+import { useGetIsLoggedIn, useGetAccountInfo } from 'lib';
+import { CRYPTO_CURRENCIES } from './constants/currencies';
+import { getUserTokenBalance } from './helpers/cnetApi';
+import { TokenType } from './types';
+
+const API_ADDRESS = "https://testnet-api.cyber.network";
 
 export const Swap = () => {
   const isLoggedIn = useGetIsLoggedIn();
-  const [selectedFromToken, setSelectedFromToken] = useState('CNET');
+  const { address } = useGetAccountInfo();
+  const [selectedFromToken, setSelectedFromToken] = useState('Select...');
   const [selectedToToken, setSelectedToToken] = useState('Select...');
   const [dropdownOpenFrom, setDropdownOpenFrom] = useState(false);
   const [dropdownOpenTo, setDropdownOpenTo] = useState(false);
+  const [balanceFrom, setBalanceFrom] = useState(0);
+  const [balanceTo, setBalanceTo] = useState(0);
+  const [amountFrom, setAmountFrom] = useState('');
+  const [amountTo, setAmountTo] = useState('');
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -20,23 +29,87 @@ export const Swap = () => {
     }
   }, [isLoggedIn, navigate]);
 
-  const tokens = [
-    { name: 'CNET', logo: CnetLogo },
-    { name: 'Token1', logo: CnetLogo },
-    { name: 'Token2', logo: CnetLogo },
-    { name: 'Token3', logo: CnetLogo }
-  ];
+  useEffect(() => {
+    const fetchBalances = async () => {
+      if (address && selectedFromToken !== 'Select...') {
+        const tokenFrom = CRYPTO_CURRENCIES.find(token => token.label === selectedFromToken) as TokenType;
+        if (tokenFrom) {
+          const dataFrom = await getUserTokenBalance(API_ADDRESS, address, tokenFrom.id);
+          if (dataFrom.length > 0) {
+            const balance = dataFrom[0].balance / Math.pow(10, tokenFrom.decimal);
+            setBalanceFrom(Math.floor(balance * 100) / 100);
+          }
+        }
+      }
+      if (address && selectedToToken !== 'Select...') {
+        const tokenTo = CRYPTO_CURRENCIES.find(token => token.label === selectedToToken) as TokenType;
+        if (tokenTo) {
+          const dataTo = await getUserTokenBalance(API_ADDRESS, address, tokenTo.id);
+          if (dataTo.length > 0) {
+            const balance = dataTo[0].balance / Math.pow(10, tokenTo.decimal);
+            setBalanceTo(Math.floor(balance * 100) / 100);
+          }
+        }
+      }
+    };
+
+    fetchBalances();
+  }, [address, selectedFromToken, selectedToToken]);
+
+  useEffect(() => {
+    const calculateAmountTo = async () => {
+      if (selectedFromToken !== 'Select...' && selectedToToken !== 'Select...' && amountFrom !== '') {
+        const tokenFrom = CRYPTO_CURRENCIES.find(token => token.label === selectedFromToken) as TokenType;
+        const tokenTo = CRYPTO_CURRENCIES.find(token => token.label === selectedToToken) as TokenType;
+
+        if (tokenFrom && tokenTo && tokenFrom.pools) {
+          const poolAddress = tokenFrom.pools[tokenTo.value.toLowerCase()];
+          if (poolAddress) {
+            const data = await getUserTokenBalance(API_ADDRESS, poolAddress, `${tokenFrom.id},${tokenTo.id}`);
+            if (data.length === 2) {
+              const fromPool = data.find((token: any) => token.identifier === tokenFrom.id);
+              const toPool = data.find((token: any) => token.identifier === tokenTo.id);
+
+              if (fromPool && toPool) {
+                const fromPoolBalance = parseFloat(fromPool.balance);
+                const toPoolBalance = parseFloat(toPool.balance);
+
+                const k = fromPoolBalance * toPoolBalance;
+                const firstTokenAmount = parseFloat(amountFrom) * Math.pow(10, tokenFrom.decimal);
+
+                const newFromPoolBalance = fromPoolBalance + firstTokenAmount;
+                const newToPoolBalance = k / newFromPoolBalance;
+                const secondTokenAmount = (toPoolBalance - newToPoolBalance) * 0.99;
+
+                setAmountTo((secondTokenAmount / Math.pow(10, tokenTo.decimal)).toFixed(2));
+              }
+            }
+          }
+        }
+      }
+    };
+
+    calculateAmountTo();
+  }, [selectedFromToken, selectedToToken, amountFrom]);
+
+  useEffect(() => {
+    if (amountFrom === '') {
+      setAmountTo('');
+    }
+  }, [amountFrom]);
 
   const dropdownFromRef = useRef<HTMLDivElement>(null);
   const dropdownToRef = useRef<HTMLDivElement>(null);
 
-  const handleTokenSelectFrom = (token: { name: any; logo?: string }) => {
-    setSelectedFromToken(token.name);
+  const handleTokenSelectFrom = (token: any) => {
+    setSelectedFromToken(token.label);
+    setSelectedToToken('Select...'); // Reset To Token
     setDropdownOpenFrom(false);
+    setBalanceTo(0); // Reset balanceTo when changing from token
   };
 
-  const handleTokenSelectTo = (token: { name: any; logo?: string }) => {
-    setSelectedToToken(token.name);
+  const handleTokenSelectTo = (token: any) => {
+    setSelectedToToken(token.label);
     setDropdownOpenTo(false);
   };
 
@@ -62,21 +135,27 @@ export const Swap = () => {
     };
   }, []);
 
+  const availableToTokens = selectedFromToken === 'WCNET'
+    ? CRYPTO_CURRENCIES.filter(token => token.label !== 'WCNET')
+    : CRYPTO_CURRENCIES.filter(token => token.label === 'WCNET');
+
   return (
     <div className='flex flex-col p-6 max-w-2xl w-full bg-white shadow-md rounded h-full'>
       <div className='flex flex-col'>
-      <h2 className='text-2xl font-bold p-2 text-center'>Swap</h2>
-      <p className='text-gray-400 text-center mb-8'>Trade tokens in an instant</p>
+        <h2 className='text-2xl font-bold p-2 text-center'>Swap</h2>
+        <p className='text-gray-400 text-center mb-8'>Trade tokens in an instant</p>
         <div className='text-sm border border-gray-200 rounded-xl p-6'>
           <div className='mb-6'>
             <div className='flex justify-between items-center mb-1 mx-1'>
               <span className='text-xs'>Swap From:</span>
-              <span className='text-xs'>Balance: 0 {selectedFromToken}</span>
+              <span className='text-xs'>Balance: {balanceFrom} {selectedFromToken}</span>
             </div>
             <div className='flex items-center p-3 rounded-xl bg-gray-100'>
               <input
                 type='number'
                 placeholder='Amount'
+                value={amountFrom}
+                onChange={e => setAmountFrom(e.target.value)}
                 className='bg-transparent pl-3 text-black flex-grow outline-none no-arrows'
                 style={{ minWidth: '0' }}
               />
@@ -90,23 +169,29 @@ export const Swap = () => {
                 onClick={() => setDropdownOpenFrom(!dropdownOpenFrom)}
               >
                 <button className='flex items-center'>
-                  <img src={CnetLogo} alt='CNET' className='w-6 h-6 mr-2' />
-                  <span>{selectedFromToken}</span>
+                  {selectedFromToken === 'Select...' ? (
+                    <span className='text-gray-500'>{selectedFromToken}</span>
+                  ) : (
+                    <>
+                      <img src={CRYPTO_CURRENCIES.find(token => token.label === selectedFromToken)?.icon} alt={selectedFromToken} className='w-6 h-6 mr-2' />
+                      <span>{selectedFromToken}</span>
+                    </>
+                  )}
                 </button>
                 {dropdownOpenFrom && (
                   <div className='absolute mt-2 w-32 bg-white border border-gray-200 rounded-md shadow-lg z-10'>
-                    {tokens.map((token) => (
+                    {CRYPTO_CURRENCIES.map((token) => (
                       <button
-                        key={token.name}
+                        key={token.value}
                         className='flex items-center w-full px-4 py-2 text-left hover:bg-gray-100'
                         onClick={() => handleTokenSelectFrom(token)}
                       >
                         <img
-                          src={token.logo}
-                          alt={token.name}
+                          src={token.icon}
+                          alt={token.label}
                           className='w-6 h-6 mr-2'
                         />
-                        <span>{token.name}</span>
+                        <span>{token.label}</span>
                       </button>
                     ))}
                   </div>
@@ -122,14 +207,17 @@ export const Swap = () => {
           <div className='mb-6'>
             <div className='flex justify-between items-center mb-1 mx-1'>
               <span className='text-xs'>Swap To:</span>
-              <span className='text-xs'>Balance: 0 {selectedToToken}</span>
+              <span className='text-xs'>Balance: {balanceTo} {selectedToToken}</span>
             </div>
             <div className='flex items-center p-3 rounded-xl bg-gray-100'>
               <input
                 type='number'
                 placeholder='Amount'
+                value={amountTo}
+                onChange={e => setAmountTo(e.target.value)}
                 className='bg-transparent pl-3 text-black flex-grow outline-none no-arrows'
                 style={{ minWidth: '0' }}
+                disabled={selectedFromToken === 'Select...'}
               />
               {selectedToToken !== 'Select...' && (
                 <button className='bg-blue-500 text-white text-xs px-3 py-1 rounded-full ml-2'>
@@ -142,30 +230,30 @@ export const Swap = () => {
                 ref={dropdownToRef}
                 onClick={() => setDropdownOpenTo(!dropdownOpenTo)}
               >
-                <button className='flex items-center'>
+                <button className='flex items-center' disabled={selectedFromToken === 'Select...'}>
                   {selectedToToken === 'Select...' ? (
                     <span className='text-gray-500'>{selectedToToken}</span>
                   ) : (
                     <>
-                      <img src={CnetLogo} alt='CNET' className='w-6 h-6 mr-2' />
+                      <img src={CRYPTO_CURRENCIES.find(token => token.label === selectedToToken)?.icon} alt={selectedToToken} className='w-6 h-6 mr-2' />
                       <span>{selectedToToken}</span>
                     </>
                   )}
                 </button>
                 {dropdownOpenTo && (
                   <div className='absolute mt-2 w-32 bg-white border border-gray-200 rounded-md shadow-lg z-10'>
-                    {tokens.map((token) => (
+                    {availableToTokens.map((token) => (
                       <button
-                        key={token.name}
+                        key={token.value}
                         className='flex items-center w-full px-4 py-2 text-left hover:bg-gray-100'
                         onClick={() => handleTokenSelectTo(token)}
                       >
                         <img
-                          src={token.logo}
-                          alt={token.name}
+                          src={token.icon}
+                          alt={token.label}
                           className='w-6 h-6 mr-2'
                         />
-                        <span>{token.name}</span>
+                        <span>{token.label}</span>
                       </button>
                     ))}
                   </div>
