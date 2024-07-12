@@ -2,6 +2,7 @@ import { Buffer } from 'buffer';
 import React, { useState } from 'react';
 import { Address } from '@multiversx/sdk-core';
 import { UserWallet, Mnemonic, UserSecretKey } from '@multiversx/sdk-wallet';
+import * as bip39 from 'bip39';
 
 const createKeystoreFromMnemonic = async (mnemonic: string, password: string) => {
   try {
@@ -47,7 +48,11 @@ const ProgressBar: React.FC<{ step: number }> = ({ step }) => {
   );
 };
 
-export const CreateWallet: React.FC = () => {
+interface CreateWalletProps {
+  onClose: () => void;
+}
+
+export const CreateWallet: React.FC<CreateWalletProps> = ({ onClose }) => {
   const [password, setPassword] = useState<string>('');
   const [confirmPassword, setConfirmPassword] = useState<string>('');
   const [passwordError, setPasswordError] = useState<string>('');
@@ -70,20 +75,30 @@ export const CreateWallet: React.FC = () => {
   const [showCreateWallet, setShowCreateWallet] = useState<boolean>(true);
 
   const handleCreateWallet = async () => {
+    const passwordRequirements = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
+    
+    if (!passwordRequirements.test(password)) {
+      setPasswordError('Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, and one number.');
+      return;
+    }
+  
     if (password !== confirmPassword) {
       setPasswordError('Passwords do not match. Please try again.');
       return;
     }
+  
     setPasswordError('');
     try {
       const result = await createKeystoreFromMnemonic(mnemonic, password);
       setWalletAddress(result.address);
       setKeystore(JSON.stringify(result.keystore, null, 2));
       setIsWalletCreated(true);
+      downloadKeystore(result.address, JSON.stringify(result.keystore, null, 2));
     } catch (error) {
       console.error('Error creating keystore:', error);
     }
   };
+  
 
   const handleVerificationInput = (index: number, value: string) => {
     setVerificationInput((prevState) => ({ ...prevState, [index]: value }));
@@ -102,11 +117,11 @@ export const CreateWallet: React.FC = () => {
     }
   };
 
-  const downloadKeystore = () => {
+  const downloadKeystore = (address: string, keystore: string) => {
     const element = document.createElement('a');
     const file = new Blob([keystore], { type: 'application/json' });
     element.href = URL.createObjectURL(file);
-    element.download = `${walletAddress}.json`;
+    element.download = `${address}.json`;
     document.body.appendChild(element); // Required for this to work in FireFox
     element.click();
   };
@@ -116,7 +131,18 @@ export const CreateWallet: React.FC = () => {
   };
 
   const formattedMnemonic = mnemonic.split(' ').map((word, index) => `${index + 1} ${word}`).join('\n');
-  const sortedMnemonicWords = mnemonic.split(' ').sort();
+  const sortedMnemonicWords = bip39.wordlists.english.sort();
+
+  const generateVerificationWords = () => {
+    const words = mnemonic.split(' ');
+    const randomIndices = new Set<number>();
+    while (randomIndices.size < 3) {
+      randomIndices.add(Math.floor(Math.random() * 24));
+    }
+    setVerificationWords(
+      Array.from(randomIndices).map((index) => ({ index, word: words[index] }))
+    );
+  };
 
   if (!showCreateWallet) {
     return null; // or render another component/page
@@ -133,7 +159,7 @@ export const CreateWallet: React.FC = () => {
             <div className='mb-6'>
               <div className='grid grid-cols-4 gap-2'>
                 {mnemonic.split(' ').map((word, index) => (
-                  <div key={index} className='p-2 bg-gray-200 rounded'>
+                  <div key={`${word}-${index}`} className='p-2 bg-gray-200 rounded'>
                     {index + 1} {word}
                   </div>
                 ))}
@@ -145,7 +171,7 @@ export const CreateWallet: React.FC = () => {
                 Copy Mnemonic
               </button>
               <div className='mt-4'>
-              <label className='flex items-center'>
+                <label className='flex items-center'>
                   <input
                     type='checkbox'
                     checked={isAcknowledged}
@@ -159,13 +185,7 @@ export const CreateWallet: React.FC = () => {
                 </label>
                 <button
                   onClick={() => {
-                    const words = mnemonic.split(' ');
-                    const randomIndices = Array.from({ length: 3 }, () =>
-                      Math.floor(Math.random() * 24)
-                    );
-                    setVerificationWords(
-                      randomIndices.map((index) => ({ index, word: words[index] }))
-                    );
+                    generateVerificationWords();
                     setIsVerificationPhase(true);
                   }}
                   className='w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-md text-base mt-2'
@@ -195,7 +215,7 @@ export const CreateWallet: React.FC = () => {
                   className='bg-gray-100 p-2 rounded-xl outline-none w-full'
                 />
                 <datalist id={`wordlist-${index}`}>
-                  {sortedMnemonicWords.map((mnemonicWord, idx) => (
+                  {sortedMnemonicWords.filter(mnemonicWord => mnemonicWord.startsWith(verificationInput[index] || '')).map((mnemonicWord, idx) => (
                     <option key={idx} value={mnemonicWord} />
                   ))}
                 </datalist>
@@ -267,13 +287,16 @@ export const CreateWallet: React.FC = () => {
               Great work. You downloaded the keystore file. <br />Save it, you’ll need it to access your wallet.
             </p>
             <button
-              onClick={() => setShowCreateWallet(false)}
+              onClick={() => {
+                onClose();
+                setShowCreateWallet(false);
+              }}
               className='w-full bg-blue-500 text-white py-3 rounded-md text-base mt-5'
             >
               Access Wallet
             </button>
             <button
-              onClick={downloadKeystore}
+              onClick={() => downloadKeystore(walletAddress, keystore)}
               className='text-green text-base mt-4'
             >
               Download keystore file again

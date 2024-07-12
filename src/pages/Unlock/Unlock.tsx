@@ -93,7 +93,7 @@ export const Unlock = () => {
                 >
                   X
                 </button>
-                <CreateWallet />
+                <CreateWallet onClose={() => setShowCreateWallet(false)} />
               </div>
             </div>
           )}
