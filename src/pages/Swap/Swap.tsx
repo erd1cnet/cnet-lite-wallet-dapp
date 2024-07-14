@@ -8,7 +8,7 @@ import { CRYPTO_CURRENCIES } from './constants/currencies';
 import { getUserTokenBalance } from './helpers/cnetApi';
 import { TokenType } from './types';
 import { useFormik } from 'formik';
-import * as Yup from 'yup';
+//import * as Yup from 'yup';
 import BigNumber from 'bignumber.js';
 
 const API_ADDRESS = "https://testnet-api.cyber.network";
@@ -162,18 +162,9 @@ export const Swap = () => {
       amount: '',
       sliderValue: 0,
     },
-    validationSchema: Yup.object({
-      amount: Yup.number()
-        .required('Amount is required')
-        .min(0, 'Amount must be greater than or equal to 0')
-        .max(balanceFrom, `Amount must be less than or equal to ${balanceFrom}`),
-      sliderValue: Yup.number()
-        .min(0)
-        .max(100),
-    }),
+
     onSubmit: async (values) => {
-      if (new BigNumber(values.amount).isZero()) {
-        alert('Amount must be greater than 0');
+      if (new BigNumber(values.amount).isZero() || values.amount == '' || new BigNumber(balanceFrom) < new BigNumber(values.amount)) {
         return;
       }
 
