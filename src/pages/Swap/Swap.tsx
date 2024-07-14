@@ -97,7 +97,7 @@ export const Swap = () => {
 
                 const newFromPoolBalance = fromPoolBalance + firstTokenAmount;
                 const newToPoolBalance = k / newFromPoolBalance;
-                const secondTokenAmount = (toPoolBalance - newToPoolBalance) * 0.95;
+                const secondTokenAmount = (toPoolBalance - newToPoolBalance) * 0.90;
 
                 setAmountTo((secondTokenAmount / Math.pow(10, tokenTo.decimal)).toFixed(2));
               }
@@ -259,7 +259,14 @@ export const Swap = () => {
                   onBlur={formik.handleBlur}
                   name="amount"
                 />
-                <button type="button" className='bg-blue-500 text-white text-xs px-3 py-1 rounded-full ml-2'>
+                <button
+                  type="button"
+                  className='bg-blue-500 text-white text-xs px-3 py-1 rounded-full ml-2'
+                  onClick={() => {
+                    setAmountFrom(balanceFrom.toString());
+                    formik.setFieldValue('amount', balanceFrom.toString());
+                  }}
+                >
                   MAX
                 </button>
                 <div
@@ -321,11 +328,11 @@ export const Swap = () => {
                   name="amountTo"
                   onBlur={formik.handleBlur}
                 />
-                {selectedToToken !== 'Select...' && (
+                {/* {selectedToToken !== 'Select...' && (
                   <button type="button" className='bg-blue-500 text-white text-xs px-3 py-1 rounded-full ml-2'>
                     MAX
                   </button>
-                )}
+                )} */}
                 <div
                   className='ml-2 p-2 relative bg-white rounded-l-full'
                   style={{ flexShrink: 0 }}
