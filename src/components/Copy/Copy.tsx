@@ -3,8 +3,7 @@ import { faCheck, faCopy } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 export const Copy = ({
-  value,
-  className = ''
+  value
 }: {
   value: string;
   className?: string;
@@ -19,7 +18,7 @@ export const Copy = ({
 
   return (
     <span
-      className={`ml-0.5 inline-block cursor-pointer px-1 hover:text-white ${className} ${
+      className={`ml-0.5 inline-block cursor-pointer px-1 hover:text-white ${
         confirm ? 'text-white' : 'text-gray-400'
       }`}
       onClick={copy}
