@@ -105,14 +105,6 @@ export const Header = () => {
               </li>
               <li>
                 <MxLink
-                  to={routeNames.signMessage}
-                  className='block py-2 px-3 md:p-0 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700'
-                >
-                  Sign Message
-                </MxLink>
-              </li>
-              <li>
-                <MxLink
                   to={routeNames.swap}
                   className='block py-2 px-3 md:p-0 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700'
                 >
