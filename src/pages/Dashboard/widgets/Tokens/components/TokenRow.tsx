@@ -59,6 +59,16 @@ export const TokenRow = ({ token }: { token: TokenType }) => {
               <FormatAmount value={token.balance} showLabel={false} />
             </div>
           )}
+          {token.identifier === 'WCNET-26845d' && (
+            <button
+              className='text-xs text-white rounded bg-blue-600 hover:bg-blue-700 px-2 py-1'
+              data-testid={`unwrap-${token.identifier}`}
+              onClick={() => setShowUnwrap(true)}
+              title="Unwrap"
+            >
+              Unwrap
+            </button>
+          )}
           <button
             className='text-xs text-white rounded bg-red-600 hover:bg-red-700 px-2 py-1'
             data-testid={`send-${token.identifier}-send`}
@@ -66,14 +76,6 @@ export const TokenRow = ({ token }: { token: TokenType }) => {
             title="Send"
           >
             <FontAwesomeIcon icon={faArrowUp} />
-          </button>
-          <button
-            className='text-xs text-white rounded bg-blue-600 hover:bg-blue-700 px-2 py-1'
-            data-testid={`unwrap-${token.identifier}`}
-            onClick={() => setShowUnwrap(true)}
-            title="Unwrap"
-          >
-            Unwrap
           </button>
           <button
             className='text-xs text-white rounded bg-green-600 hover:bg-green-700 px-2 py-1'
