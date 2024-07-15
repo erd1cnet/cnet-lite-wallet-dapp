@@ -99,7 +99,7 @@ export const Unwrap: React.FC<UnwrapProps> = ({ onClose, balance }) => {
               type='submit'
               className='bg-blue-500 text-white rounded-lg p-2 w-1/2 ml-2'
             >
-              Wrap
+              Unwrap
             </button>
           </div>
           {errorMessage && (
