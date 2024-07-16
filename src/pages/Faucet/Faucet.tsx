@@ -39,9 +39,6 @@ const FaucetForm = () => {
         {
           recaptcha: recaptchaToken,
           wallet_address: address
-        },
-        {
-          withCredentials: true
         }
       );
 
