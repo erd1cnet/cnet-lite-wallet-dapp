@@ -10,18 +10,6 @@ import { useGetAccountInfo, useGetIsLoggedIn } from 'lib';
 import { DataTestIdsEnum } from 'localConstants';
 import { routeNames } from 'routes';
 
-const getCSRFToken = () => {
-  const cookies = document.cookie.split(';');
-  for (let cookie of cookies) {
-    cookie = cookie.trim();
-    console.log(cookie);  // Tüm cookie'leri konsola yazdırın
-    if (cookie.startsWith('csrftoken=')) {
-      return cookie.substring('csrftoken='.length, cookie.length);
-    }
-  }
-  return null;
-};
-
 const FaucetForm = () => {
   const isLoggedIn = useGetIsLoggedIn();
   const { executeRecaptcha } = useGoogleReCaptcha();
@@ -35,14 +23,6 @@ const FaucetForm = () => {
     }
   }, [isLoggedIn, navigate]);
 
-  useEffect(() => {
-    // Bu useEffect hook'unda csrftoken cookie'sinin olup olmadığını kontrol edin
-    const csrftoken = getCSRFToken();
-    if (!csrftoken) {
-      console.error('CSRF token not found');
-    }
-  }, []);
-
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
 
@@ -52,7 +32,6 @@ const FaucetForm = () => {
     }
 
     const recaptchaToken = await executeRecaptcha('faucet');
-    const csrftoken = getCSRFToken();
 
     try {
       const response = await axios.post(
@@ -62,10 +41,7 @@ const FaucetForm = () => {
           wallet_address: address
         },
         {
-          withCredentials: true,
-          headers: {
-            'X-CSRFToken': csrftoken, // CSRF tokenını header'a ekle
-          }
+          withCredentials: true
         }
       );
 
@@ -76,13 +52,9 @@ const FaucetForm = () => {
       );
     } catch (error) {
       if (axios.isAxiosError(error) && error.response) {
-        if (error.response.status === 429) {
-          setMessage('Too many requests. Please try again later.');
-        } else {
-          setMessage(
-            error.response.data.error || 'An error occurred. Please try again.'
-          );
-        }
+        setMessage(
+          error.response.data.error || 'An error occurred. Please try again.'
+        );
       } else {
         setMessage('An error occurred. Please try again.');
       }
