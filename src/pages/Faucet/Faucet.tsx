@@ -10,6 +10,17 @@ import { useGetAccountInfo, useGetIsLoggedIn } from 'lib';
 import { DataTestIdsEnum } from 'localConstants';
 import { routeNames } from 'routes';
 
+const getCSRFToken = () => {
+  const cookies = document.cookie.split(';');
+  for (let cookie of cookies) {
+    cookie = cookie.trim();
+    if (cookie.startsWith('csrftoken=')) {
+      return cookie.substring('csrftoken='.length, cookie.length);
+    }
+  }
+  return null;
+};
+
 const FaucetForm = () => {
   const isLoggedIn = useGetIsLoggedIn();
   const { executeRecaptcha } = useGoogleReCaptcha();
@@ -32,6 +43,7 @@ const FaucetForm = () => {
     }
 
     const recaptchaToken = await executeRecaptcha('faucet');
+    const csrftoken = getCSRFToken();
 
     try {
       const response = await axios.post(
@@ -41,7 +53,10 @@ const FaucetForm = () => {
           wallet_address: address
         },
         {
-          withCredentials: true
+          withCredentials: true,
+          headers: {
+            'X-CSRFToken': csrftoken, 
+          }
         }
       );
 
