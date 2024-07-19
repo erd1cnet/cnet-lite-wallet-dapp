@@ -10,7 +10,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useNavigate } from 'react-router-dom';
 import { FormatAmount } from 'components';
 import { SearchParamsEnum } from 'localConstants';
-import { sendRouteBuilder, swapRouteBuilder } from 'routes'; // swapRouteBuilder'ı da import et
+import { sendRouteBuilder, swapRouteBuilder } from 'routes'; 
 import { TokenType } from 'types';
 import { Unwrap } from './Unwrap';
 
@@ -56,7 +56,7 @@ export const TokenRow = ({ token }: { token: TokenType }) => {
         <div className='flex items-center space-x-2'>
           {token.balance && (
             <div className='text-right'>
-              <FormatAmount value={token.balance} showLabel={false} />
+              <FormatAmount value={token.balance} decimals={token.decimals} showLabel={false} />
             </div>
           )}
           {token.identifier === 'WCNET-26845d' && (
