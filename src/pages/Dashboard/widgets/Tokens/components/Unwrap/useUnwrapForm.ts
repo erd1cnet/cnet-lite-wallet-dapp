@@ -1,7 +1,12 @@
+import BigNumber from 'bignumber.js';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
-import { prepareTransaction, sendTransactions, useGetAccountInfo, useGetNetworkConfig } from 'lib'; // Adjust import paths accordingly
-import BigNumber from 'bignumber.js';
+import {
+  prepareTransaction,
+  sendTransactions,
+  useGetAccountInfo,
+  useGetNetworkConfig
+} from 'lib'; // Adjust import paths accordingly
 
 const stringToHex = (str: string) => {
   return Buffer.from(str, 'utf8').toString('hex');
@@ -17,21 +22,21 @@ const toHex = (value: BigNumber | string | number) => {
 
 export const useUnwrapForm = (balance: number, closeModal: () => void) => {
   const { account } = useGetAccountInfo();
-  const { chainID } = useGetNetworkConfig();
+  const {
+    network: { chainId }
+  } = useGetNetworkConfig();
 
   const formik = useFormik({
     initialValues: {
       amount: '',
-      sliderValue: 0,
+      sliderValue: 0
     },
     validationSchema: Yup.object({
       amount: Yup.number()
         .required('Amount is required')
         .min(0, 'Amount must be greater than or equal to 0')
         .max(balance, `Amount must be less than or equal to ${balance}`),
-      sliderValue: Yup.number()
-        .min(0)
-        .max(100),
+      sliderValue: Yup.number().min(0).max(100)
     }),
     onSubmit: async (values) => {
       if (new BigNumber(values.amount).isZero()) {
@@ -39,8 +44,12 @@ export const useUnwrapForm = (balance: number, closeModal: () => void) => {
         return;
       }
 
-      const amountInWei = toHex(new BigNumber(values.amount).multipliedBy(1e18)); // Convert amount to hexadecimal
-      const dataField = `ESDTTransfer@${stringToHex('WCNET-26845d')}@${amountInWei}@${stringToHex('unwrapCnet')}`;
+      const amountInWei = toHex(
+        new BigNumber(values.amount).multipliedBy(1e18)
+      ); // Convert amount to hexadecimal
+      const dataField = `ESDTTransfer@${stringToHex(
+        'WCNET-26845d'
+      )}@${amountInWei}@${stringToHex('unwrapCnet')}`;
 
       const transaction = prepareTransaction({
         receiver: 'erd1qqqqqqqqqqqqqpgqanfqk9f647prsz0rsl4mx4gmycyw2pfn74nsrq05yg', // Typically, token unwrap transactions send to the sender's address
@@ -51,7 +60,7 @@ export const useUnwrapForm = (balance: number, closeModal: () => void) => {
         sender: account.address,
         gasPrice: '1000000000', // Adjust the gas price as needed
         nonce: account.nonce,
-        chainId: chainID,
+        chainId
       });
 
       const transactionObject = {
@@ -60,8 +69,8 @@ export const useUnwrapForm = (balance: number, closeModal: () => void) => {
         transactionsDisplayInfo: {
           processingMessage: 'Processing transaction...',
           errorMessage: 'Transaction failed',
-          successMessage: 'Transaction successful',
-        },
+          successMessage: 'Transaction successful'
+        }
       };
 
       await sendTransactions(transactionObject);
@@ -70,7 +79,7 @@ export const useUnwrapForm = (balance: number, closeModal: () => void) => {
       if (closeModal) {
         closeModal();
       }
-    },
+    }
   });
 
   return formik;

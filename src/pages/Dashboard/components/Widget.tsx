@@ -28,7 +28,8 @@ export const Widget = ({
   reference,
   anchor,
   widget: MxWidget,
-  props = {}
+  props = {},
+  button // Add this line
 }: WidgetType) => {
   const { isWebProvider } = useIsWebProvider();
   const callbackRoute = anchor
@@ -41,6 +42,7 @@ export const Widget = ({
       description={description}
       reference={reference}
       anchor={anchor}
+      button={button} // Add this line
     >
       <MxWidget callbackRoute={callbackRoute} {...props} />
     </Card>

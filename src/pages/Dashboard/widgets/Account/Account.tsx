@@ -78,10 +78,7 @@ export const Account = () => {
                   >
                     X
                   </button>
-                  <Wrap
-                    onClose={() => setShowWrap(false)}
-                    balance={balance}
-                  />
+                  <Wrap onClose={() => setShowWrap(false)} balance={balance} />
                 </div>
               </div>
             )}
