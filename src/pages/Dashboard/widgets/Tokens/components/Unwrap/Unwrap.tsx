@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { useUnwrapForm } from './useUnwrapForm'; // Adjust the import path accordingly
 import BigNumber from 'bignumber.js';
+import { useUnwrapForm } from './useUnwrapForm'; // Adjust the import path accordingly
 
 interface UnwrapProps {
   onClose: () => void;
@@ -46,7 +46,9 @@ export const Unwrap: React.FC<UnwrapProps> = ({ onClose, balance }) => {
           <div className='mb-10'>
             <div className='flex justify-between items-center mb-1 mx-1'>
               <span className='text-xs'>Amount:</span>
-              <span className='text-xs'>Balance: {convertedBalance.toFixed(4)} WCNET</span>
+              <span className='text-xs'>
+                Balance: {convertedBalance.toFixed(4)} WCNET
+              </span>
             </div>
             <div className='flex items-center p-3 rounded-xl bg-gray-100'>
               <input
@@ -54,18 +56,19 @@ export const Unwrap: React.FC<UnwrapProps> = ({ onClose, balance }) => {
                 placeholder='Amount'
                 value={formik.values.amount}
                 onChange={formik.handleChange}
-                
                 className='bg-transparent pl-3 text-black flex-grow outline-none no-arrows'
                 style={{ minWidth: '0' }}
                 onBlur={formik.handleBlur}
-                name="amount"
+                name='amount'
               />
               {formik.touched.amount && formik.errors.amount ? (
-                <div className='text-red-600 text-sm'>{formik.errors.amount}</div>
+                <div className='text-red-600 text-sm'>
+                  {formik.errors.amount}
+                </div>
               ) : null}
 
               <button
-                type="button"
+                type='button'
                 className='bg-blue-500 text-white text-xs px-3 py-1 rounded-full ml-2'
                 onClick={handleMaxClick}
               >

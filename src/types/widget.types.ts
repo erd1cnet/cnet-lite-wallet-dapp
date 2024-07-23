@@ -1,3 +1,5 @@
+import { ReactNode } from 'react';
+
 export type WidgetProps = {
   callbackRoute: string;
 };
@@ -9,4 +11,5 @@ export type WidgetType<T = any> = {
   props?: { receiver?: string };
   reference: string;
   anchor?: string;
+  button?: ReactNode; // Add this line
 };

@@ -1,24 +1,29 @@
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
-import { prepareTransaction, sendTransactions, useGetAccountInfo, useGetNetworkConfig } from 'lib'; // Adjust import paths accordingly
+import {
+  prepareTransaction,
+  sendTransactions,
+  useGetAccountInfo,
+  useGetNetworkConfig
+} from 'lib'; // Adjust import paths accordingly
 
 export const useWrapForm = (balance: number, closeModal: () => void) => {
   const { account } = useGetAccountInfo();
-  const { chainID } = useGetNetworkConfig();
+  const {
+    network: { chainId }
+  } = useGetNetworkConfig();
 
   const formik = useFormik({
     initialValues: {
       amount: '',
-      sliderValue: 0,
+      sliderValue: 0
     },
     validationSchema: Yup.object({
       amount: Yup.number()
         .required('Amount is required')
         .min(0, 'Amount must be greater than or equal to 0')
         .max(balance, `Amount must be less than or equal to ${balance}`),
-      sliderValue: Yup.number()
-        .min(0)
-        .max(100),
+      sliderValue: Yup.number().min(0).max(100)
     }),
     onSubmit: async (values) => {
       if (Number(values.amount) === 0) {
@@ -27,7 +32,8 @@ export const useWrapForm = (balance: number, closeModal: () => void) => {
       }
 
       const transaction = prepareTransaction({
-        receiver: 'erd1qqqqqqqqqqqqqpgqanfqk9f647prsz0rsl4mx4gmycyw2pfn74nsrq05yg',
+        receiver:
+          'erd1qqqqqqqqqqqqqpgqanfqk9f647prsz0rsl4mx4gmycyw2pfn74nsrq05yg',
         amount: values.amount,
         gasLimit: '2000000',
         data: 'wrapCnet',
@@ -35,7 +41,7 @@ export const useWrapForm = (balance: number, closeModal: () => void) => {
         sender: account.address,
         gasPrice: '1000000000', // You can adjust the gas price as needed
         nonce: account.nonce,
-        chainId: chainID,
+        chainId
       });
 
       const transactionObject = {
@@ -44,8 +50,8 @@ export const useWrapForm = (balance: number, closeModal: () => void) => {
         transactionsDisplayInfo: {
           processingMessage: 'Processing transaction...',
           errorMessage: 'Transaction failed',
-          successMessage: 'Transaction successful',
-        },
+          successMessage: 'Transaction successful'
+        }
       };
 
       await sendTransactions(transactionObject);
@@ -54,7 +60,7 @@ export const useWrapForm = (balance: number, closeModal: () => void) => {
       if (closeModal) {
         closeModal();
       }
-    },
+    }
   });
 
   return formik;
