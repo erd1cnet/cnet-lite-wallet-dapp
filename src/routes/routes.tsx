@@ -13,7 +13,8 @@ import {
   SignMessageHook,
   Swap,
   Faucet,
-  ListToken
+  ListToken,
+  CreatePool // Import the new CreatePool component
 } from 'pages';
 import { Send } from 'pages/Send/Send';
 import { Sign } from 'pages/Sign/Sign';
@@ -111,9 +112,15 @@ const routesObject: Record<RouteNamesEnum | HooksPageEnum, RouteWithTitleType> =
     },
     [RouteNamesEnum.listToken]: {
       path: RouteNamesEnum.listToken,
-      title: 'ListToken',
+      title: 'List Token',
       component: ListToken
     },
+    // Add new route for CreatePool
+    [RouteNamesEnum.createPool]: {
+      path: `${RouteNamesEnum.listToken}/create`,
+      title: 'Create Pool',
+      component: CreatePool
+    }
   };
 
 export const routes: RouteWithTitleType[] = Object.values(routesObject);

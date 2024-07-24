@@ -28,7 +28,10 @@ const ListTokenForm = () => {
         3 steps to list your token
       </p>
       <div className='mt-4 flex flex-col align-middle space-y-4'>
-        <button className='transition-colors duration-200 bg-blue-600 hover:bg-blue-700 text-white py-12 rounded-3xl flex items-center justify-center'>
+        <button
+          className='transition-colors duration-200 bg-blue-600 hover:bg-blue-700 text-white py-12 rounded-3xl flex items-center justify-center'
+          onClick={() => navigate('/list-token/create')}
+        >
           <div className='text-center'>
             <FontAwesomeIcon
               icon={faWaterLadder}

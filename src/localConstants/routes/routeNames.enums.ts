@@ -7,17 +7,19 @@ export enum HooksEnum {
 
 export enum RouteNamesEnum {
   home = '/',
-  dashboard = '/dashboard',
   unlock = '/unlock',
+  logout = '/logout',
+  dashboard = '/dashboard',
   disclaimer = '/disclaimer',
   send = '/send',
-  logout = '/logout',
   sign = '/sign',
   signMessage = '/sign-message',
   swap = '/swap',
   faucet = '/faucet',
-  listToken = '/list-token'
+  listToken = '/list-token',
+  createPool = '/list-token/create'
 }
+
 
 export enum HooksPageEnum {
   sign = `/hook/${HooksEnum.sign}`,

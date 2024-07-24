@@ -1,12 +1,15 @@
 import { Buffer } from 'buffer';
 import React, { useState } from 'react';
+import { faCheck, faCopy } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Address } from '@multiversx/sdk-core';
 import { UserWallet, Mnemonic, UserSecretKey } from '@multiversx/sdk-wallet';
 import * as bip39 from 'bip39';
-import { faCheck, faCopy } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-const createKeystoreFromMnemonic = async (mnemonic: string, password: string) => {
+const createKeystoreFromMnemonic = async (
+  mnemonic: string,
+  password: string
+) => {
   try {
     const mnemonicService = Mnemonic.fromString(mnemonic);
     const secretKey: UserSecretKey = mnemonicService.deriveKey();
@@ -81,29 +84,33 @@ export const CreateWallet: React.FC<CreateWalletProps> = ({ onClose }) => {
 
   const handleCreateWallet = async () => {
     const passwordRequirements = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
-    
+
     if (!passwordRequirements.test(password)) {
-      setPasswordError('Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, and one number.');
+      setPasswordError(
+        'Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, and one number.'
+      );
       return;
     }
-  
+
     if (password !== confirmPassword) {
       setPasswordError('Passwords do not match. Please try again.');
       return;
     }
-  
+
     setPasswordError('');
     try {
       const result = await createKeystoreFromMnemonic(mnemonic, password);
       setWalletAddress(result.address);
       setKeystore(JSON.stringify(result.keystore, null, 2));
       setIsWalletCreated(true);
-      downloadKeystore(result.address, JSON.stringify(result.keystore, null, 2));
+      downloadKeystore(
+        result.address,
+        JSON.stringify(result.keystore, null, 2)
+      );
     } catch (error) {
       console.error('Error creating keystore:', error);
     }
   };
-  
 
   const handleVerificationInput = (index: number, value: string) => {
     setVerificationInput((prevState) => ({ ...prevState, [index]: value }));
@@ -137,7 +144,10 @@ export const CreateWallet: React.FC<CreateWalletProps> = ({ onClose }) => {
     setTimeout(() => setIsCopied(false), 2000); // 2 seconds before resetting to faCopy
   };
 
-  const formattedMnemonic = mnemonic.split(' ').map((word, index) => `${index + 1} ${word}`).join('\n');
+  const formattedMnemonic = mnemonic
+    .split(' ')
+    .map((word, index) => `${index + 1} ${word}`)
+    .join('\n');
   const sortedMnemonicWords = bip39.wordlists.english.sort();
 
   const generateVerificationWords = () => {
@@ -157,21 +167,36 @@ export const CreateWallet: React.FC<CreateWalletProps> = ({ onClose }) => {
 
   return (
     <div className='flex flex-col p-4'>
-      <ProgressBar step={isWalletCreated ? 4 : isPasswordPhase ? 3 : isVerificationPhase ? 2 : 1} />
+      <ProgressBar
+        step={
+          isWalletCreated
+            ? 4
+            : isPasswordPhase
+            ? 3
+            : isVerificationPhase
+            ? 2
+            : 1
+        }
+      />
       {!isVerificationPhase && !isPasswordPhase ? (
         <>
           <h2 className='text-2xl font-bold p-2 text-center'>Create Wallet</h2>
-          <p className='text-gray-400 text-center mb-8'>Write down these words in this exact order. You can use them to access your wallet, make sure you protect them.</p>
-          <div className="text-sm border border-gray-200 rounded-xl p-6">
-            <div className="mb-6">
-              <div className="flex flex-wrap gap-2 justify-center">
+          <p className='text-gray-400 text-center mb-8'>
+            Write down these words in this exact order. You can use them to
+            access your wallet, make sure you protect them.
+          </p>
+          <div className='text-sm border border-gray-200 rounded-xl p-6'>
+            <div className='mb-6'>
+              <div className='flex flex-wrap gap-2 justify-center'>
                 {mnemonic.split(' ').map((word, index) => (
                   <div
                     key={`${word}-${index}`}
-                    className="p-2 bg-gray-200 rounded flex-grow-0 flex-shrink-0"
+                    className='p-2 bg-gray-200 rounded flex-grow-0 flex-shrink-0'
                   >
-                    <div className="flex justify-center items-center">
-                      <span className="mr-1 text-xs text-gray-400">{index + 1}</span>
+                    <div className='flex justify-center items-center'>
+                      <span className='mr-1 text-xs text-gray-400'>
+                        {index + 1}
+                      </span>
                       <span>{word}</span>
                     </div>
                   </div>
@@ -179,20 +204,22 @@ export const CreateWallet: React.FC<CreateWalletProps> = ({ onClose }) => {
               </div>
               <button
                 onClick={() => copyToClipboard(formattedMnemonic)}
-                className="text-xs bg-amber-300 hover:bg-amber-400 py-2 px-3 rounded-md mt-5 mx-auto block"
+                className='text-xs bg-amber-300 hover:bg-amber-400 py-2 px-3 rounded-md mt-5 mx-auto block'
               >
-                <FontAwesomeIcon icon={isCopied ? faCheck : faCopy} /> {isCopied ? 'Copied' : 'Copy'}
+                <FontAwesomeIcon icon={isCopied ? faCheck : faCopy} />{' '}
+                {isCopied ? 'Copied' : 'Copy'}
               </button>
-              <div className="mt-4">
-                <label className="flex items-center">
+              <div className='mt-4'>
+                <label className='flex items-center'>
                   <input
-                    type="checkbox"
+                    type='checkbox'
                     checked={isAcknowledged}
                     onChange={(e) => setIsAcknowledged(e.target.checked)}
-                    className="mr-2"
+                    className='mr-2'
                   />
                   <span>
-                    I acknowledge that if I lose my mnemonic, my wallet cannot be recovered.
+                    I acknowledge that if I lose my mnemonic, my wallet cannot
+                    be recovered.
                   </span>
                 </label>
                 <button
@@ -200,7 +227,7 @@ export const CreateWallet: React.FC<CreateWalletProps> = ({ onClose }) => {
                     generateVerificationWords();
                     setIsVerificationPhase(true);
                   }}
-                  className="w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-md text-base mt-2"
+                  className='w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-md text-base mt-2'
                   disabled={!isAcknowledged}
                 >
                   Proceed to Verification
@@ -208,12 +235,13 @@ export const CreateWallet: React.FC<CreateWalletProps> = ({ onClose }) => {
               </div>
             </div>
           </div>
-
         </>
       ) : !isVerified ? (
         <>
           <h2 className='text-2xl font-bold p-2 text-center'>Surprise Quiz</h2>
-          <p className='text-gray-400 text-center mb-8'>Enter the words from your Secret Phrase as indicated below.</p>
+          <p className='text-gray-400 text-center mb-8'>
+            Enter the words from your Secret Phrase as indicated below.
+          </p>
           <div className='text-sm border border-gray-200 rounded-xl p-6'>
             {verificationWords.map(({ index }) => (
               <div key={index} className='mb-6'>
@@ -228,9 +256,13 @@ export const CreateWallet: React.FC<CreateWalletProps> = ({ onClose }) => {
                   className='bg-gray-100 p-2 rounded-xl outline-none w-full'
                 />
                 <datalist id={`wordlist-${index}`}>
-                  {sortedMnemonicWords.filter(mnemonicWord => mnemonicWord.startsWith(verificationInput[index] || '')).map((mnemonicWord, idx) => (
-                    <option key={idx} value={mnemonicWord} />
-                  ))}
+                  {sortedMnemonicWords
+                    .filter((mnemonicWord) =>
+                      mnemonicWord.startsWith(verificationInput[index] || '')
+                    )
+                    .map((mnemonicWord, idx) => (
+                      <option key={idx} value={mnemonicWord} />
+                    ))}
                 </datalist>
               </div>
             ))}
@@ -253,8 +285,13 @@ export const CreateWallet: React.FC<CreateWalletProps> = ({ onClose }) => {
         </>
       ) : !isWalletCreated ? (
         <>
-          <h2 className='text-2xl font-bold p-2 text-center'>Awesome, now create a password</h2>
-          <p className='text-gray-400 text-center mb-8'>The wallet made a secret key for you and stored it in a file. <br />Protect your Keystore File with a password.</p>
+          <h2 className='text-2xl font-bold p-2 text-center'>
+            Awesome, now create a password
+          </h2>
+          <p className='text-gray-400 text-center mb-8'>
+            The wallet made a secret key for you and stored it in a file. <br />
+            Protect your Keystore File with a password.
+          </p>
           <div className='text-sm border border-gray-200 rounded-xl p-6'>
             <div className='mb-6'>
               <div className='flex flex-col mb-4'>
@@ -275,9 +312,7 @@ export const CreateWallet: React.FC<CreateWalletProps> = ({ onClose }) => {
                   className='bg-gray-100 p-3 rounded-xl outline-none'
                 />
               </div>
-              {passwordError && (
-                <p className='text-red-500'>{passwordError}</p>
-              )}
+              {passwordError && <p className='text-red-500'>{passwordError}</p>}
             </div>
             <button
               onClick={handleCreateWallet}
@@ -290,14 +325,15 @@ export const CreateWallet: React.FC<CreateWalletProps> = ({ onClose }) => {
       ) : (
         <>
           <h2 className='text-2xl font-bold p-2 text-center'>Wallet Created</h2>
-          <p className='text-gray-400 text-center mb-8'>Your wallet is ready. Enjoy the world of blockchain!</p>
+          <p className='text-gray-400 text-center mb-8'>
+            Your wallet is ready. Enjoy the world of blockchain!
+          </p>
           <div className='text-sm border border-gray-200 rounded-xl p-6 text-center'>
             <div className='text-6xl text-green-500'>✓</div>
-            <h3 className='text-lg font-bold mt-4'>
-              Wallet created!
-            </h3>
+            <h3 className='text-lg font-bold mt-4'>Wallet created!</h3>
             <p className='mt-2'>
-              Great work. You downloaded the keystore file. <br />Save it, you’ll need it to access your wallet.
+              Great work. You downloaded the keystore file. <br />
+              Save it, you’ll need it to access your wallet.
             </p>
             <button
               onClick={() => {
