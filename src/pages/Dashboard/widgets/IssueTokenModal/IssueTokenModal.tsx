@@ -88,7 +88,7 @@ export const IssueTokenModal: React.FC<IssueTokenModalProps> = ({ isOpen, onClos
       nonce: account.nonce,
       sender: account.address,
       receiver,
-      value: '50000000000000000', // 0.05 EGLD
+      value: '50000000000000000', 
       data,
       gasLimit: 65000000,
       chainID: '55'

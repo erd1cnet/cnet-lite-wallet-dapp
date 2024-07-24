@@ -33,7 +33,7 @@ export const useWrapForm = (balance: number, closeModal: () => void) => {
 
       const transaction = prepareTransaction({
         receiver:
-          'erd1qqqqqqqqqqqqqpgqanfqk9f647prsz0rsl4mx4gmycyw2pfn74nsrq05yg',
+          'erd1qqqqqqqqqqqqqpgqm03h5ueactsrgrsu965hn8ljeq68fxzt74nspyjsw9',
         amount: values.amount,
         gasLimit: '2000000',
         data: 'wrapCnet',

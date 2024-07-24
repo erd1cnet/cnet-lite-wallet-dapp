@@ -52,7 +52,7 @@ export const useUnwrapForm = (balance: number, closeModal: () => void) => {
       )}@${amountInWei}@${stringToHex('unwrapCnet')}`;
 
       const transaction = prepareTransaction({
-        receiver: 'erd1qqqqqqqqqqqqqpgqanfqk9f647prsz0rsl4mx4gmycyw2pfn74nsrq05yg', // Typically, token unwrap transactions send to the sender's address
+        receiver: 'erd1qqqqqqqqqqqqqpgqm03h5ueactsrgrsu965hn8ljeq68fxzt74nspyjsw9', // Typically, token unwrap transactions send to the sender's address
         amount: '0', // Token transfer amount is specified in the data field, so this should be 0
         gasLimit: '2000000',
         data: dataField,
