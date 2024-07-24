@@ -41,7 +41,7 @@ export const Wrap: React.FC<WrapProps> = ({ onClose, balance }) => {
             <div className='flex justify-between items-center mb-1 mx-1'>
               <span className='text-xs'>Amount:</span>
               <span className='text-xs'>
-                Balance: {balance.toFixed(4)} xCNET
+                Balance: {balance.toFixed(2)} xCNET
               </span>
             </div>
             <div className='flex items-center p-3 rounded-xl bg-gray-100'>
