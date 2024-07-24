@@ -47,7 +47,7 @@ export const Unwrap: React.FC<UnwrapProps> = ({ onClose, balance }) => {
             <div className='flex justify-between items-center mb-1 mx-1'>
               <span className='text-xs'>Amount:</span>
               <span className='text-xs'>
-                Balance: {convertedBalance.toFixed(4)} WCNET
+                Balance: {convertedBalance.toFixed(2)} WCNET
               </span>
             </div>
             <div className='flex items-center p-3 rounded-xl bg-gray-100'>

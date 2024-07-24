@@ -3,7 +3,13 @@ import { useScrollToElement } from 'hooks';
 import { WidgetType } from 'types/widget.types';
 import { AuthRedirectWrapper } from 'wrappers';
 import { Widget } from './components';
-import { Account, NFTs, Tokens, Transactions, IssueTokenModal } from './widgets';
+import {
+  Account,
+  NFTs,
+  Tokens,
+  Transactions,
+  IssueTokenModal
+} from './widgets';
 
 export const Dashboard = () => {
   useScrollToElement();

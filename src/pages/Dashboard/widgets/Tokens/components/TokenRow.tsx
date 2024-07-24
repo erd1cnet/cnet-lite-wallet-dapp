@@ -10,7 +10,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useNavigate } from 'react-router-dom';
 import { FormatAmount } from 'components';
 import { SearchParamsEnum } from 'localConstants';
-import { sendRouteBuilder, swapRouteBuilder } from 'routes'; 
+import { sendRouteBuilder, swapRouteBuilder } from 'routes';
 import { TokenType } from 'types';
 import { Unwrap } from './Unwrap';
 
@@ -56,15 +56,19 @@ export const TokenRow = ({ token }: { token: TokenType }) => {
         <div className='flex items-center space-x-2'>
           {token.balance && (
             <div className='text-right'>
-              <FormatAmount value={token.balance} decimals={token.decimals} showLabel={false} />
+              <FormatAmount
+                value={token.balance}
+                decimals={token.decimals}
+                showLabel={false}
+              />
             </div>
           )}
-          {token.identifier === 'WCNET-26845d' && (
+          {token.identifier === 'WCNET-2200e8' && (
             <button
               className='text-xs text-white rounded bg-blue-600 hover:bg-blue-700 px-2 py-1'
               data-testid={`unwrap-${token.identifier}`}
               onClick={() => setShowUnwrap(true)}
-              title="Unwrap"
+              title='Unwrap'
             >
               Unwrap
             </button>
@@ -73,7 +77,7 @@ export const TokenRow = ({ token }: { token: TokenType }) => {
             className='text-xs text-white rounded bg-red-600 hover:bg-red-700 px-2 py-1'
             data-testid={`send-${token.identifier}-send`}
             onClick={handleSend}
-            title="Send"
+            title='Send'
           >
             <FontAwesomeIcon icon={faArrowUp} />
           </button>
@@ -81,7 +85,7 @@ export const TokenRow = ({ token }: { token: TokenType }) => {
             className='text-xs text-white rounded bg-green-600 hover:bg-green-700 px-2 py-1'
             data-testid={`send-receive-${token.identifier}`}
             onClick={handleSwap}
-            title="Send"
+            title='Send'
           >
             <FontAwesomeIcon icon={faArrowUp} />{' '}
             <FontAwesomeIcon icon={faArrowDown} />
