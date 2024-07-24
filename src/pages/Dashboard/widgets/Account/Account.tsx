@@ -58,6 +58,7 @@ export const Account = () => {
                     value={account.balance}
                     egldLabel={network.egldLabel}
                     data-testid='balance'
+                    digits={2}
                   />
                 </span>
                 <button
