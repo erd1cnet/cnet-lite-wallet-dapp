@@ -13,7 +13,7 @@ import {
   SignMessageHook,
   Swap,
   Faucet,
-  Pools
+  ListToken
 } from 'pages';
 import { Send } from 'pages/Send/Send';
 import { Sign } from 'pages/Sign/Sign';
@@ -109,10 +109,10 @@ const routesObject: Record<RouteNamesEnum | HooksPageEnum, RouteWithTitleType> =
       title: 'Faucet',
       component: Faucet
     },
-    [RouteNamesEnum.pools]: {
-      path: RouteNamesEnum.pools,
-      title: 'Pools',
-      component: Pools
+    [RouteNamesEnum.listToken]: {
+      path: RouteNamesEnum.listToken,
+      title: 'ListToken',
+      component: ListToken
     },
   };
 

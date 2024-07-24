@@ -5,7 +5,7 @@ import { useGetIsLoggedIn } from 'lib';
 import { DataTestIdsEnum } from 'localConstants';
 import { routeNames } from 'routes';
 
-const PoolsForm = () => {
+const ListTokenForm = () => {
   const isLoggedIn = useGetIsLoggedIn();
   const navigate = useNavigate();
 
@@ -39,6 +39,6 @@ const PoolsForm = () => {
   );
 };
 
-export const Pools = () => {
-  return <PoolsForm />;
+export const ListToken = () => {
+  return <ListTokenForm />;
 };

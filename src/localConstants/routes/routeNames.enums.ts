@@ -16,7 +16,7 @@ export enum RouteNamesEnum {
   signMessage = '/sign-message',
   swap = '/swap',
   faucet = '/faucet',
-  pools = '/pools'
+  listToken = '/list-token'
 }
 
 export enum HooksPageEnum {
