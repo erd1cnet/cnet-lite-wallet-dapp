@@ -12,7 +12,8 @@ import {
   SignMessage,
   SignMessageHook,
   Swap,
-  Faucet
+  Faucet,
+  ListToken
 } from 'pages';
 import { Send } from 'pages/Send/Send';
 import { Sign } from 'pages/Sign/Sign';
@@ -107,6 +108,11 @@ const routesObject: Record<RouteNamesEnum | HooksPageEnum, RouteWithTitleType> =
       path: RouteNamesEnum.faucet,
       title: 'Faucet',
       component: Faucet
+    },
+    [RouteNamesEnum.listToken]: {
+      path: RouteNamesEnum.listToken,
+      title: 'ListToken',
+      component: ListToken
     },
   };
 

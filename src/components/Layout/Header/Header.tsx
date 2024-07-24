@@ -113,6 +113,14 @@ export const Header = () => {
               </li>
               <li>
                 <MxLink
+                  to={routeNames.listToken}
+                  className='block py-2 px-3 md:p-0 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700'
+                >
+                  List Token
+                </MxLink>
+              </li>
+              <li>
+                <MxLink
                   to={routeNames.faucet}
                   className='block py-2 px-3 md:p-0 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700'
                 >
