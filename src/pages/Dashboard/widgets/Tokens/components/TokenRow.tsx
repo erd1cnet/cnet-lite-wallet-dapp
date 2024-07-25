@@ -3,7 +3,7 @@ import { MouseEvent } from 'react';
 import {
   faArrowUp,
   faCoins,
-  faArrowDown,
+  faArrowRightArrowLeft,
   faTimes
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -90,10 +90,9 @@ export const TokenRow = ({ token }: { token: TokenType }) => {
             className='text-xs text-white rounded bg-green-600 hover:bg-green-700 px-2 py-1'
             data-testid={`send-receive-${token.identifier}`}
             onClick={handleSwap}
-            title='Send'
+            title='Swap'
           >
-            <FontAwesomeIcon icon={faArrowUp} />{' '}
-            <FontAwesomeIcon icon={faArrowDown} />
+            <FontAwesomeIcon icon={faArrowRightArrowLeft} />
           </button>
         </div>
       </div>

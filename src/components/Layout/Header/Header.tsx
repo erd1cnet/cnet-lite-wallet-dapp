@@ -34,13 +34,13 @@ export const Header = () => {
           to={isLoggedIn ? routeNames.dashboard : routeNames.home}
           className='flex items-center space-x-3'
         >
-          <MultiversXLogo className='h-8' />
+          <MultiversXLogo className='h-7' />
           <div className='flex gap-1 items-center'>
             <div className='w-2 h-2 rounded-full bg-green-500' />
-            <p className='text-gray-600 text-xs'>{environment}</p>
+            <p className='text-gray-500 text-xs'>{environment}</p>
           </div>
         </MxLink>
-        <div className='flex md:order-2 space-x-3 md:space-x-0'>
+        <div className='flex md:order-2 space-x-2 md:space-x-0'>
           {isLoggedIn ? (
             <MxLink
               className='flex items-center rounded-lg px-4 py-2 bg-red-600 hover:bg-red-700 text-white'
