@@ -1,7 +1,10 @@
-// src/pages/ListToken/CreatePool/ProgressBar.tsx
 import React from 'react';
 
-const ProgressBar = ({ step }) => {
+type ProgressBarProps = {
+  step: number;
+};
+
+const ProgressBar: React.FC<ProgressBarProps> = ({ step }) => {
   const steps = 4;
   const progress = (step / steps) * 100;
 
