@@ -12,16 +12,16 @@ const CRYPTO_CURRENCIES: TokenType[] = [
     {
         value: 'wcnet',
         label: 'WCNET',
-        id: 'WCNET-76764a',
+        id: 'WCNET-8e61de',
         decimal: 18,
         name: 'CyberNetwork',
         icon: wcnet,
         pools: {
-            usdc: 'erd1qqqqqqqqqqqqqpgq90czf67nzws8qfm3aqkuhcykvavx9kkd74nszupuf0',
-            cyber: 'erd1qqqqqqqqqqqqqpgquzapr6qc206ghy5l2thng7qmx67frtzj74nsg3y5qp',
-            usdt: 'erd1qqqqqqqqqqqqqpgqhqyxmm9plvtf5n0nqqh34fh2sxlgx44774ns7flzxk',
-            wegld: 'erd1qqqqqqqqqqqqqpgqjnmgcqkguwlrrzpzsunay5kpnt030y5h74nswuamc4',
-            ash: 'erd1qqqqqqqqqqqqqpgqzg068jj2fwss2sp8k22djjn6n3pjszgt74nsp9jx6v'
+            usdc: 'erd1qqqqqqqqqqqqqpgqe4exh0eznlchn98cezw8xlxpqp77uh3674ns3aaqgq',
+            cyber: 'erd1qqqqqqqqqqqqqpgql7gash3h2uhsyx0zelc5vld0na4mrhkw74nsqfvnqh',
+            usdt: 'erd1qqqqqqqqqqqqqpgq54lh5ajtkval0pvmf778jx3jc242sl0y74ns02kutg',
+            wegld: 'erd1qqqqqqqqqqqqqpgq4f2a8hal7mhkq5jlfk5fm3ud568dad6f74nsdq24ex',
+            ash: 'erd1qqqqqqqqqqqqqpgqck75fgy60jstucr7v4khcqxysehd2tsd74nsrj0lj5'
         }
     },
     {
@@ -32,7 +32,7 @@ const CRYPTO_CURRENCIES: TokenType[] = [
         name: 'MultiversX',
         icon: wegld,
         pools: {
-            wcnet: 'erd1qqqqqqqqqqqqqpgqjnmgcqkguwlrrzpzsunay5kpnt030y5h74nswuamc4'
+            wcnet: 'erd1qqqqqqqqqqqqqpgq4f2a8hal7mhkq5jlfk5fm3ud568dad6f74nsdq24ex'
         }
     },
     {
@@ -43,7 +43,7 @@ const CRYPTO_CURRENCIES: TokenType[] = [
         name: 'USDC',
         icon: usdc,
         pools: {
-            wcnet: 'erd1qqqqqqqqqqqqqpgq90czf67nzws8qfm3aqkuhcykvavx9kkd74nszupuf0'
+            wcnet: 'erd1qqqqqqqqqqqqqpgqe4exh0eznlchn98cezw8xlxpqp77uh3674ns3aaqgq'
         }
     },
     {
@@ -54,7 +54,7 @@ const CRYPTO_CURRENCIES: TokenType[] = [
         id: 'CYBER-4c1a56',
         icon: cyber,
         pools: {
-            wcnet: 'erd1qqqqqqqqqqqqqpgquzapr6qc206ghy5l2thng7qmx67frtzj74nsg3y5qp'
+            wcnet: 'erd1qqqqqqqqqqqqqpgql7gash3h2uhsyx0zelc5vld0na4mrhkw74nsqfvnqh'
         }
     },
     {
@@ -65,7 +65,7 @@ const CRYPTO_CURRENCIES: TokenType[] = [
         name: 'ASH',
         icon: ash,
         pools: {
-            wcnet: 'erd1qqqqqqqqqqqqqpgqzg068jj2fwss2sp8k22djjn6n3pjszgt74nsp9jx6v'
+            wcnet: 'erd1qqqqqqqqqqqqqpgqck75fgy60jstucr7v4khcqxysehd2tsd74nsrj0lj5'
         }
     },
     {
@@ -76,7 +76,7 @@ const CRYPTO_CURRENCIES: TokenType[] = [
         name: 'USDT',
         icon: usdt,
         pools: {
-            wcnet: 'erd1qqqqqqqqqqqqqpgqhqyxmm9plvtf5n0nqqh34fh2sxlgx44774ns7flzxk'
+            wcnet: 'erd1qqqqqqqqqqqqqpgq54lh5ajtkval0pvmf778jx3jc242sl0y74ns02kutg'
         }
     }
 ];
