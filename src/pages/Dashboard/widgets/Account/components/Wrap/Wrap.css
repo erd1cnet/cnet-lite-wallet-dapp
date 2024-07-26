@@ -1,0 +1,91 @@
+.slider-container {
+    position: relative;
+    width: 100%;
+    margin-top: 20px;
+}
+
+.slider {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 8px;
+    background: linear-gradient(to right, #007bff 0%, #007bff var(--value), #ddd var(--value), #ddd 100%);
+    outline: none;
+    transition: background 0.2s;
+    position: relative;
+    z-index: 2; /* Adjusted z-index */
+    border-radius: 4px; /* Round the corners */
+}
+
+.slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 16px; /* Adjusted size */
+    height: 16px; /* Adjusted size */
+    background: #007bff;
+    cursor: pointer;
+    border-radius: 50%;
+    z-index: 3; /* Adjusted z-index */
+    position: relative;
+    top: 3px; /* Adjusted to move down */
+}
+
+.slider::-moz-range-thumb {
+    width: 16px; /* Adjusted size */
+    height: 16px; /* Adjusted size */
+    background: #007bff;
+    cursor: pointer;
+    border-radius: 50%;
+    z-index: 3; /* Adjusted z-index */
+    position: relative;
+    top: 3px; /* Adjusted to move down */
+}
+
+.slider-marks {
+    position: absolute;
+    top: 40%;
+    left: 0;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    transform: translateY(-50%);
+    pointer-events: none; /* To ensure marks are not clickable */
+    z-index: 5; /* Adjusted z-index */
+    
+}
+
+.slider-marks span {
+    width: 20px; /* Outer circle size */
+    height: 20px; /* Outer circle size */
+    background: #ddd;
+    border-radius: 50%;
+    z-index: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    top: 3px; /* Adjust to move down */
+}
+
+.slider-marks span::before {
+    content: '';
+    width: 16px; /* Inner circle size */
+    height: 16px; /* Inner circle size */
+    background: #ddd;
+    border-radius: 50%;
+}
+
+.slider-marks span.active::before {
+    background: #007bff;
+}
+
+.tooltip {
+    position: absolute;
+    top: -40px; /* Tooltip'i slider'ın üzerine yerleştirir */
+    transform: translateX(-50%);
+    background-color: black;
+    color: white;
+    padding: 5px;
+    border-radius: 3px;
+    white-space: nowrap;
+}
