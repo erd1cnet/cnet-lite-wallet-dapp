@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { faPowerOff } from '@fortawesome/free-solid-svg-icons';
-import { faLongArrowRight } from '@fortawesome/free-solid-svg-icons';
+import { faPowerOff, faBars } from '@fortawesome/free-solid-svg-icons';
+import { faArrowRightFromBracket } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useMatch } from 'react-router-dom';
 import { MxLink } from 'components/MxLink';
@@ -19,7 +19,7 @@ export const Header = () => {
   const ConnectButton = !isUnlockRoute ? (
     <MxLink to={RouteNamesEnum.unlock}>
       Connect
-      <FontAwesomeIcon className='pl-3' icon={faLongArrowRight} />
+      <FontAwesomeIcon className='pl-2' icon={faArrowRightFromBracket} />
     </MxLink>
   ) : null;
 
@@ -32,7 +32,7 @@ export const Header = () => {
       <div className='max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4 min-h-[72px]'>
         <MxLink
           to={isLoggedIn ? routeNames.dashboard : routeNames.home}
-          className='flex items-center space-x-3'
+          className='flex items-center space-x-1'
         >
           <MultiversXLogo className='h-7' />
           <div className='flex gap-1 items-center'>
@@ -43,7 +43,7 @@ export const Header = () => {
         <div className='flex md:order-2 space-x-2 md:space-x-0'>
           {isLoggedIn ? (
             <MxLink
-              className='flex items-center rounded-lg px-4 py-2 bg-red-600 hover:bg-red-700 text-white'
+              className='flex items-center rounded-lg px-3.5 py-3 bg-red-600 hover:bg-red-700 text-white'
               to={routeNames.logout}
             >
               <FontAwesomeIcon icon={faPowerOff} />
@@ -55,27 +55,12 @@ export const Header = () => {
             <button
               data-collapse-toggle='navbar-cta'
               type='button'
-              className='inline-flex items-center p-2 w-10 h-10 justify-center text-sm text-gray-500 rounded-lg md:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200'
+              className='flex items-center rounded-lg px-3.5 py-3 bg-gray-100 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-200 md:hidden text-black'
               aria-controls='navbar-cta'
               aria-expanded={isMobileMenuOpen}
               onClick={toggleMobileMenu}
             >
-              <span className='sr-only'>Open main menu</span>
-              <svg
-                className='w-5 h-5'
-                aria-hidden='true'
-                xmlns='http://www.w3.org/2000/svg'
-                fill='none'
-                viewBox='0 0 17 14'
-              >
-                <path
-                  stroke='currentColor'
-                  strokeLinecap='round'
-                  strokeLinejoin='round'
-                  strokeWidth='2'
-                  d='M1 1h15M1 7h15M1 13h15'
-                />
-              </svg>
+              <FontAwesomeIcon icon={faBars} />
             </button>
           )}
         </div>
