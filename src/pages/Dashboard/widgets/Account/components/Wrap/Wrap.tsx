@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useWrapForm } from './useWrapForm'; // Adjust the import path accordingly
 import './Wrap.css'; // Adjust the import path accordingly
 
 interface WrapProps {
@@ -7,48 +8,47 @@ interface WrapProps {
 }
 
 export const Wrap: React.FC<WrapProps> = ({ onClose, balance }) => {
-  const [inputValue, setInputValue] = useState<string>('0');
-  const [sliderValue, setSliderValue] = useState<number>(0);
+  const formik = useWrapForm(balance, onClose);
   const [isSliderChanging, setIsSliderChanging] = useState<boolean>(false);
-  const [errorMessage, setErrorMessage] = useState<string>('');
   const [tooltipVisible, setTooltipVisible] = useState<boolean>(false);
   const [tooltipPosition, setTooltipPosition] = useState<number>(0);
 
   useEffect(() => {
     if (isSliderChanging) {
-      const newAmount = (balance * (sliderValue / 100)).toFixed(2);
-      setInputValue(newAmount);
+      let newAmount = balance * (formik.values.sliderValue / 100);
+      if (formik.values.sliderValue === 100) {
+        newAmount -= 0.1;
+      }
+      formik.setFieldValue('amount', newAmount.toFixed(2));
       setIsSliderChanging(false);
     }
-  }, [sliderValue, balance, isSliderChanging]);
+  }, [formik.values.sliderValue, balance, isSliderChanging]);
 
   const handleMaxClick = () => {
     const maxAmount = (parseFloat(balance.toFixed(2)) - 0.1).toFixed(2);
-    setInputValue(maxAmount);
-    setSliderValue(100);
-    setErrorMessage('');
+    formik.setFieldValue('amount', maxAmount);
+    formik.setFieldValue('sliderValue', 100);
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     if (!isNaN(Number(value))) {
-      setInputValue(value);
+      formik.setFieldValue('amount', value);
       const percentage = (Number(value) / balance) * 100;
-      setSliderValue(percentage);
+      formik.setFieldValue('sliderValue', percentage);
 
       if (Number(value) > balance) {
-        setErrorMessage('The amount cannot be greater than the balance.');
+        formik.setFieldError('amount', 'The amount cannot be greater than the balance.');
       } else {
-        setErrorMessage('');
+        formik.setFieldError('amount', '');
       }
     }
   };
 
   const handleSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newSliderValue = Number(e.target.value);
-    setSliderValue(newSliderValue);
+    formik.setFieldValue('sliderValue', newSliderValue);
     setIsSliderChanging(true);
-    setErrorMessage('');
   };
 
   const handleSliderMouseMove = (e: React.MouseEvent<HTMLInputElement>) => {
@@ -60,15 +60,7 @@ export const Wrap: React.FC<WrapProps> = ({ onClose, balance }) => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (Number(inputValue) === 0) {
-      setErrorMessage('Amount must be greater than 0');
-    } else if (Number(inputValue) > balance) {
-      setErrorMessage('The amount cannot be greater than the balance.');
-    } else {
-      setErrorMessage('');
-      console.log('Form submitted with amount:', inputValue);
-      onClose();
-    }
+    await formik.handleSubmit(e);
   };
 
   return (
@@ -87,7 +79,7 @@ export const Wrap: React.FC<WrapProps> = ({ onClose, balance }) => {
               <input
                 type='number'
                 placeholder='Amount'
-                value={inputValue}
+                value={formik.values.amount}
                 onChange={handleInputChange}
                 className='bg-transparent pl-3 text-black flex-grow outline-none no-arrows'
                 style={{ minWidth: '0' }}
@@ -95,9 +87,9 @@ export const Wrap: React.FC<WrapProps> = ({ onClose, balance }) => {
                 step='0.01'
                 min='0'
               />
-              {errorMessage && (
+              {formik.errors.amount && (
                 <div className='text-red-600 text-sm'>
-                  {errorMessage}
+                  {formik.errors.amount}
                 </div>
               )}
               <button
@@ -115,29 +107,29 @@ export const Wrap: React.FC<WrapProps> = ({ onClose, balance }) => {
               min='0'
               max='100'
               step={1}
-              value={sliderValue}
+              value={formik.values.sliderValue}
               onChange={handleSliderChange}
               onMouseMove={handleSliderMouseMove}
               onMouseDown={() => setTooltipVisible(true)}
               onMouseLeave={() => setTooltipVisible(false)}
               onMouseUp={() => setTooltipVisible(false)}
               className='slider'
-              style={{ '--value': `${sliderValue}%` } as React.CSSProperties}
+              style={{ '--value': `${formik.values.sliderValue}%` } as React.CSSProperties}
             />
             {tooltipVisible && (
               <div
                 className='tooltip'
                 style={{ left: `${tooltipPosition}%` }}
               >
-                {sliderValue}%
+                {formik.values.sliderValue}%
               </div>
             )}
             <div className="slider-marks">
-              <span className={sliderValue >= 0 ? 'active' : ''}></span>
-              <span className={sliderValue >= 25 ? 'active' : ''}></span>
-              <span className={sliderValue >= 50 ? 'active' : ''}></span>
-              <span className={sliderValue >= 75 ? 'active' : ''}></span>
-              <span className={sliderValue >= 100 ? 'active' : ''}></span>
+              <span className={formik.values.sliderValue >= 0 ? 'active' : ''}></span>
+              <span className={formik.values.sliderValue >= 25 ? 'active' : ''}></span>
+              <span className={formik.values.sliderValue >= 50 ? 'active' : ''}></span>
+              <span className={formik.values.sliderValue >= 75 ? 'active' : ''}></span>
+              <span className={formik.values.sliderValue >= 100 ? 'active' : ''}></span>
             </div>
           </div>
           <div className="flex justify-between mb-7 text-xs text-gray-600">
@@ -158,7 +150,7 @@ export const Wrap: React.FC<WrapProps> = ({ onClose, balance }) => {
             <button
               type='submit'
               className='bg-blue-500 text-white rounded-lg p-2 w-1/2 ml-2'
-              disabled={Number(inputValue) > balance}
+              disabled={Number(formik.values.amount) > balance}
             >
               Wrap
             </button>
