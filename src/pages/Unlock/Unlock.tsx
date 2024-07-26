@@ -17,8 +17,8 @@ import {
 } from 'types';
 import { AuthRedirectWrapper } from 'wrappers';
 import { Keystore, Pem } from './components';
-import { useUnlockRedirect } from './hooks';
 import { CreateWallet } from './components/CreateWallet';
+import { useUnlockRedirect } from './hooks';
 
 type CommonPropsType =
   | OperaWalletLoginButtonPropsType
@@ -39,7 +39,7 @@ export const Unlock = () => {
     <AuthRedirectWrapper requireAuth={false}>
       <div className='flex justify-center items-center'>
         <div
-          className='flex flex-col p-6 items-center justify-center gap-4 rounded-xl bg-[#f6f8fa]'
+          className='flex flex-col p-6 justify-center gap-4 rounded-xl bg-[#f6f8fa]'
           data-testid={DataTestIdsEnum.unlockPage}
         >
           <div className='flex flex-col items-center gap-1'>
@@ -74,7 +74,7 @@ export const Unlock = () => {
             </p>
           </div>
 
-          <div className='flex flex-col md:flex-row'>
+          <div className='flex justify-center items-center flex-col md:flex-row'>
             <button
               className='flex items-center rounded-lg px-4 py-2 bg-green-600 hover:bg-green-700 text-white'
               onClick={() => setShowCreateWallet(true)}

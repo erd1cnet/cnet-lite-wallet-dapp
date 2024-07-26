@@ -48,8 +48,8 @@ export const TokenRow = ({ token }: { token: TokenType }) => {
 
   return (
     <>
-      <div className='flex items-center justify-between p-4 rounded-lg border-b border-gray-200'>
-        <div className='flex items-center space-x-4'>
+      <div className='flex items-center justify-between p-3 md:p-4 rounded-lg border-b border-gray-200'>
+        <div className='flex items-center space-x-2'>
           {logo ? (
             <img src={logo} alt={token.ticker} className='w-8 h-8' />
           ) : (
@@ -57,7 +57,7 @@ export const TokenRow = ({ token }: { token: TokenType }) => {
           )}
           <div>{token.ticker}</div>
         </div>
-        <div className='flex items-center space-x-2'>
+        <div className='flex items-center space-x-1.5'>
           {token.balance && (
             <div className='text-right'>
               <FormatAmount
