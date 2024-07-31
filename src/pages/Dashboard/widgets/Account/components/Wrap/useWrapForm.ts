@@ -33,13 +33,13 @@ export const useWrapForm = (balance: number, closeModal: () => void) => {
 
       const transaction = prepareTransaction({
         receiver:
-          'erd1qqqqqqqqqqqqqpgqjpyeg6exfa934qdxp2w8cdqrgzun28ye74nstqaxnr',
+          'erd1qqqqqqqqqqqqqpgqf5ym43drpsfa6qfyn7w9ztp39czxak9h74nsxh7z4u',
         amount: values.amount,
         gasLimit: '2000000',
         data: 'wrapCnet',
         balance: account.balance,
         sender: account.address,
-        gasPrice: '1000000000', // You can adjust the gas price as needed
+        gasPrice: '1000000000', 
         nonce: account.nonce,
         chainId
       });

@@ -15,6 +15,8 @@
     position: relative;
     z-index: 2; /* Adjusted z-index */
     border-radius: 4px; /* Round the corners */
+    margin: 0; /* Remove default margin */
+    padding: 0; /* Remove default padding */
 }
 
 .slider::-webkit-slider-thumb {
@@ -27,7 +29,8 @@
     border-radius: 50%;
     z-index: 3; /* Adjusted z-index */
     position: relative;
-    top: 3px; /* Adjusted to move down */
+    margin: 0; /* Remove default margin */
+    padding: 0; /* Remove default padding */
 }
 
 .slider::-moz-range-thumb {
@@ -38,33 +41,33 @@
     border-radius: 50%;
     z-index: 3; /* Adjusted z-index */
     position: relative;
-    top: 3px; /* Adjusted to move down */
+    margin: 0; /* Remove default margin */
+    padding: 0; /* Remove default padding */
 }
 
 .slider-marks {
     position: absolute;
-    top: 40%;
+    top: 55%; /* Use 50% for consistent centering */
     left: 0;
     width: 100%;
     display: flex;
     justify-content: space-between;
     transform: translateY(-50%);
     pointer-events: none; /* To ensure marks are not clickable */
-    z-index: 5; /* Adjusted z-index */
-    
+    z-index: 1; /* Adjusted z-index */
 }
 
 .slider-marks span {
-    width: 20px; /* Outer circle size */
-    height: 20px; /* Outer circle size */
-    background: #ddd;
+    width: 16px; /* Outer circle size */
+    height: 16px; /* Outer circle size */
+    background: #d0cfd1;
     border-radius: 50%;
     z-index: 0;
     display: flex;
     justify-content: center;
     align-items: center;
     position: relative;
-    top: 3px; /* Adjust to move down */
+    top: 0; /* Remove top adjustment */
 }
 
 .slider-marks span::before {
@@ -88,4 +91,19 @@
     padding: 5px;
     border-radius: 3px;
     white-space: nowrap;
+}
+
+/* Additional browser-specific styles */
+@-moz-document url-prefix() {
+    .slider {
+        height: 8px;
+        border-radius: 4px;
+    }
+}
+
+@supports (-webkit-appearance: none) and (stroke-color: transparent) {
+    .slider {
+        height: 8px;
+        border-radius: 4px;
+    }
 }
