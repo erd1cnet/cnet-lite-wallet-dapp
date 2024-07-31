@@ -27,7 +27,7 @@ const CRYPTO_CURRENCIES: TokenType[] = [
     {
         value: 'wegld',
         label: 'WEGLD',
-        id: 'WEGLD-4660e8',
+        id: 'WEGLD-e3b384',
         decimal: 18,
         name: 'MultiversX',
         icon: wegld,
@@ -38,7 +38,7 @@ const CRYPTO_CURRENCIES: TokenType[] = [
     {
         value: 'usdc',
         label: 'USDC',
-        id: 'USDC-196479',
+        id: 'USDC-ad1552',
         decimal: 18,
         name: 'USDC',
         icon: usdc,
@@ -51,7 +51,7 @@ const CRYPTO_CURRENCIES: TokenType[] = [
         label: 'CYBER',
         name: 'Cyberpunk City',
         decimal: 18,
-        id: 'CYBER-285bc5',
+        id: 'CYBER-da6784',
         icon: cyber,
         pools: {
             wcnet: 'erd1qqqqqqqqqqqqqpgqpak7lvf8weltp2rg7vjzrd5tyum5eaug74ns68pgse'
@@ -60,7 +60,7 @@ const CRYPTO_CURRENCIES: TokenType[] = [
     {
         value: 'ash',
         label: 'ASH',
-        id: 'ASH-7c7655',
+        id: 'ASH-8232a6',
         decimal: 18,
         name: 'ASH',
         icon: ash,
@@ -71,7 +71,7 @@ const CRYPTO_CURRENCIES: TokenType[] = [
     {
         value: 'usdt',
         label: 'USDT',
-        id: 'USDT-f1b51c',
+        id: 'USDT-5a3a82',
         decimal: 18,
         name: 'USDT',
         icon: usdt,
