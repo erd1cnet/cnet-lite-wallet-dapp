@@ -17,7 +17,9 @@ export enum RouteNamesEnum {
   swap = '/swap',
   faucet = '/faucet',
   listToken = '/list-token',
-  createPool = '/list-token/create'
+  createPool = '/list-token/create',
+  swapNew = '/swap-new', 
+
 }
 
 

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   faSwimmingPool,
   faCheckCircle
@@ -7,10 +7,66 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useNavigate } from 'react-router-dom';
 import { routeNames } from 'routes';
 import ProgressBar from './ProgressBar';
+import { useGetLoginInfo } from 'lib';
 
 const CreatePool = () => {
   const [step, setStep] = useState(1);
   const navigate = useNavigate();
+  const { tokenLogin } = useGetLoginInfo();
+
+  useEffect(() => {
+    const fetchUserTokens = async () => {
+      if (tokenLogin?.nativeAuthToken) {
+        try {
+          const response = await fetch('http://192.168.1.132:3005/graphql', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${tokenLogin.nativeAuthToken}`,
+              'Accept': '*/*',
+              'Accept-Encoding': 'gzip, deflate, br',
+              'Accept-Language': 'en-US,en;q=0.5',
+              'Origin': 'http://192.168.1.132:3000',
+              'Referer': 'http://192.168.1.132:3000/',
+              'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:128.0) Gecko/20100101 Firefox/128.0',
+              'Connection': 'keep-alive',
+              'Priority': 'u=4'
+            },
+            body: JSON.stringify({
+              query: `
+                query GetUserTokens($offset: Int, $limit: Int) {
+                  userTokens(offset: $offset, limit: $limit) {
+                    identifier
+                    balance
+                  }
+                }
+              `,
+              variables: {
+                offset: 0,
+                limit: 10
+              }
+            })
+          });
+
+          if (!response.ok) {
+            throw new Error('Network response was not ok');
+          }
+
+          const data = await response.json();
+
+          if (data.errors) {
+            console.error('GraphQL Errors:', data.errors);
+          } else {
+            console.log('User Tokens:', data.data);
+          }
+        } catch (error) {
+          console.error('Error fetching user tokens:', error);
+        }
+      }
+    };
+
+    fetchUserTokens();
+  }, [tokenLogin]);
 
   const handleNext = () => {
     if (step < 5) {

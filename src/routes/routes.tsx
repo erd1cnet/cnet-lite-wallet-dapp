@@ -14,7 +14,8 @@ import {
   Swap,
   Faucet,
   ListToken,
-  CreatePool // Import the new CreatePool component
+  CreatePool,
+  SwapNew // Import the SwapNew component
 } from 'pages';
 import { Send } from 'pages/Send/Send';
 import { Sign } from 'pages/Sign/Sign';
@@ -24,104 +25,107 @@ interface RouteWithTitleType extends RouteType {
   title: string;
 }
 
-const routesObject: Record<RouteNamesEnum | HooksPageEnum, RouteWithTitleType> =
-  {
-    [RouteNamesEnum.home]: {
-      path: RouteNamesEnum.home,
-      title: 'Home',
-      component: Home
-    },
-    [RouteNamesEnum.unlock]: {
-      path: RouteNamesEnum.unlock,
-      title: 'Unlock',
-      component: Unlock
-    },
-    [RouteNamesEnum.logout]: {
-      path: RouteNamesEnum.logout,
-      title: 'Logout',
-      component: Logout
-    },
-    [RouteNamesEnum.dashboard]: {
-      path: RouteNamesEnum.dashboard,
-      authenticatedRoute: true,
-      title: 'Dashboard',
-      component: Dashboard
-    },
-    [RouteNamesEnum.disclaimer]: {
-      path: RouteNamesEnum.disclaimer,
-      title: 'Disclaimer',
-      component: Disclaimer
-    },
-    [RouteNamesEnum.send]: {
-      path: RouteNamesEnum.send,
-      authenticatedRoute: true,
-      title: 'Send',
-      component: () => (
-        <PrivateKeyCheckWrapper>
-          <Send />
-        </PrivateKeyCheckWrapper>
-      )
-    },
-    [RouteNamesEnum.sign]: {
-      path: RouteNamesEnum.sign,
-      title: 'Sign',
-      component: () => (
-        <PrivateKeyCheckWrapper>
-          <Sign />
-        </PrivateKeyCheckWrapper>
-      )
-    },
-    [RouteNamesEnum.signMessage]: {
-      path: RouteNamesEnum.signMessage,
-      title: 'Sign Message',
-      component: () => (
-        <PrivateKeyCheckWrapper>
-          <SignMessage />
-        </PrivateKeyCheckWrapper>
-      )
-    },
-    [HooksPageEnum.login]: {
-      path: HooksPageEnum.login,
-      title: 'Login',
-      component: LoginHook
-    },
-    [HooksPageEnum.sign]: {
-      path: HooksPageEnum.sign,
-      title: 'Sign',
-      component: SignHook
-    },
-    [HooksPageEnum.signMessage]: {
-      path: HooksPageEnum.signMessage,
-      title: 'Sign Message',
-      component: SignMessageHook
-    },
-    [HooksPageEnum.logout]: {
-      path: HooksPageEnum.logout,
-      title: 'Logout',
-      component: LogoutHook
-    },
-    [RouteNamesEnum.swap]: {
-      path: RouteNamesEnum.swap,
-      title: 'Swap',
-      component: Swap
-    },
-    [RouteNamesEnum.faucet]: {
-      path: RouteNamesEnum.faucet,
-      title: 'Faucet',
-      component: Faucet
-    },
-    [RouteNamesEnum.listToken]: {
-      path: RouteNamesEnum.listToken,
-      title: 'List Token',
-      component: ListToken
-    },
-    // Add new route for CreatePool
-    [RouteNamesEnum.createPool]: {
-      path: `${RouteNamesEnum.listToken}/create`,
-      title: 'Create Pool',
-      component: CreatePool
-    }
-  };
+const routesObject: Record<RouteNamesEnum | HooksPageEnum, RouteWithTitleType> = {
+  [RouteNamesEnum.home]: {
+    path: RouteNamesEnum.home,
+    title: 'Home',
+    component: Home
+  },
+  [RouteNamesEnum.unlock]: {
+    path: RouteNamesEnum.unlock,
+    title: 'Unlock',
+    component: Unlock
+  },
+  [RouteNamesEnum.logout]: {
+    path: RouteNamesEnum.logout,
+    title: 'Logout',
+    component: Logout
+  },
+  [RouteNamesEnum.dashboard]: {
+    path: RouteNamesEnum.dashboard,
+    authenticatedRoute: true,
+    title: 'Dashboard',
+    component: Dashboard
+  },
+  [RouteNamesEnum.disclaimer]: {
+    path: RouteNamesEnum.disclaimer,
+    title: 'Disclaimer',
+    component: Disclaimer
+  },
+  [RouteNamesEnum.send]: {
+    path: RouteNamesEnum.send,
+    authenticatedRoute: true,
+    title: 'Send',
+    component: () => (
+      <PrivateKeyCheckWrapper>
+        <Send />
+      </PrivateKeyCheckWrapper>
+    )
+  },
+  [RouteNamesEnum.sign]: {
+    path: RouteNamesEnum.sign,
+    title: 'Sign',
+    component: () => (
+      <PrivateKeyCheckWrapper>
+        <Sign />
+      </PrivateKeyCheckWrapper>
+    )
+  },
+  [RouteNamesEnum.signMessage]: {
+    path: RouteNamesEnum.signMessage,
+    title: 'Sign Message',
+    component: () => (
+      <PrivateKeyCheckWrapper>
+        <SignMessage />
+      </PrivateKeyCheckWrapper>
+    )
+  },
+  [HooksPageEnum.login]: {
+    path: HooksPageEnum.login,
+    title: 'Login',
+    component: LoginHook
+  },
+  [HooksPageEnum.sign]: {
+    path: HooksPageEnum.sign,
+    title: 'Sign',
+    component: SignHook
+  },
+  [HooksPageEnum.signMessage]: {
+    path: HooksPageEnum.signMessage,
+    title: 'Sign Message',
+    component: SignMessageHook
+  },
+  [HooksPageEnum.logout]: {
+    path: HooksPageEnum.logout,
+    title: 'Logout',
+    component: LogoutHook
+  },
+  [RouteNamesEnum.swap]: {
+    path: RouteNamesEnum.swap,
+    title: 'Swap',
+    component: Swap
+  },
+  [RouteNamesEnum.swapNew]: {
+    path: RouteNamesEnum.swapNew,
+    title: 'Swap New',
+    component: SwapNew
+  },
+  [RouteNamesEnum.faucet]: {
+    path: RouteNamesEnum.faucet,
+    title: 'Faucet',
+    component: Faucet
+  },
+  [RouteNamesEnum.listToken]: {
+    path: RouteNamesEnum.listToken,
+    title: 'List Token',
+    component: ListToken
+  },
+  [RouteNamesEnum.createPool]: {
+    path: RouteNamesEnum.createPool,
+    title: 'Create Pool',
+    component: CreatePool
+  }
+};
 
 export const routes: RouteWithTitleType[] = Object.values(routesObject);
 
