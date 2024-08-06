@@ -3,7 +3,6 @@ import { useFormik } from 'formik';
 import { useSwapTransaction, useSwapForm, useTokenOptions } from '../hooks';
 import { TokenType } from '../types';
 import { useGetPendingTransactions } from 'lib';
-import { getBalanceFromApi } from '../helpers/api';
 
 interface SwapFormProps {
   address: string;
@@ -22,7 +21,6 @@ const SwapForm: React.FC<SwapFormProps> = ({ address }) => {
 
   const {
     balanceFrom,
-    balanceTo,
     amountFrom,
     setAmountFrom,
     amountOut,
@@ -32,8 +30,7 @@ const SwapForm: React.FC<SwapFormProps> = ({ address }) => {
     slippage,
     setSlippage,
     pairs,
-    setBalanceFrom,
-    setBalanceTo,
+    tokenBalances,
   } = useSwapForm(address, selectedFromToken, selectedToToken);
 
   const formik = useFormik({
@@ -43,40 +40,17 @@ const SwapForm: React.FC<SwapFormProps> = ({ address }) => {
     },
     onSubmit: async (values) => {
       if (selectedFromToken && selectedToToken && pairs.length > 0) {
+        const amountOutMin = (parseFloat(amountOut) * (1 - slippage / 100)).toFixed(4);
         await performSwap({
-          amountIn: (parseFloat(values.amount) * Math.pow(10, selectedFromToken.decimals)).toString(),
-          tokenInID: selectedFromToken.identifier,
-          tokenOutID: selectedToToken.identifier,
-          amountOutMin: (parseFloat(amountOut) * (1 - slippage / 100) * Math.pow(10, selectedToToken.decimals)).toString(),
+          amountIn: values.amount,
+          selectedFromToken,
+          selectedToToken,
+          amountOutMin,
           pairAddress: pairs[0].address,
         });
       }
     },
   });
-
-  useEffect(() => {
-    if (Object.keys(pendingTransactions).length > 0) {
-      setAmountFrom('');
-      setAmountOut('');
-      fetchBalances();
-    }
-  }, [pendingTransactions]);
-
-  const fetchBalances = async () => {
-    if (address) {
-      try {
-        const data = await getBalanceFromApi(address);
-        const balancesMap = data.reduce((acc: Record<string, number>, token: any) => {
-          acc[token.identifier] = parseFloat(token.balance) / Math.pow(10, token.decimals);
-          return acc;
-        }, {});
-        setBalanceFrom(balancesMap[selectedFromToken?.identifier || ''] || 0);
-        setBalanceTo(balancesMap[selectedToToken?.identifier || ''] || 0);
-      } catch (error) {
-        console.error('Error fetching balances:', error);
-      }
-    }
-  };
 
   const handleTokenSelectFrom = (token: TokenType) => {
     setSelectedFromToken(token);
@@ -92,31 +66,37 @@ const SwapForm: React.FC<SwapFormProps> = ({ address }) => {
     return token.assets && token.assets.svgUrl ? token.ticker : token.identifier;
   };
 
-  const formatNumber = (number: string) => {
-    return parseFloat(number).toLocaleString('en-US', { maximumFractionDigits: 2 });
+  const formatNumber = (number: string | number) => {
+    return parseFloat(number.toString()).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   };
 
   const getBalanceLabel = (token: TokenType) => {
-    const balance = token.identifier === selectedFromToken?.identifier ? balanceFrom : balanceTo;
     if (Object.keys(pendingTransactions).length > 0) {
       return '--';
     }
-    return balance ? formatNumber(balance.toFixed(2)) : '0.00';
+    const balance = tokenBalances[token.identifier]?.balance || 0.00;
+    return formatNumber(balance);
   };
 
   const getBalanceUSD = (token: TokenType) => {
-    const balance = token.identifier === selectedFromToken?.identifier ? balanceFrom : balanceTo;
-    const price = parseFloat(token.price || '0');
     if (Object.keys(pendingTransactions).length > 0) {
       return '--';
     }
-    return balance ? formatNumber((balance * price).toFixed(2)) : '0.00';
+    const usdValue = tokenBalances[token.identifier]?.usdValue || 0.00;
+    return formatNumber(usdValue);
   };
 
   const getPriceLabel = (token: TokenType) => {
-    const price = parseFloat(token.price || '0');
-    return price ? `$${formatNumber(price.toFixed(2))}` : '$0.00';
+    const price = parseFloat(token.price || '0.00');
+    return `$${formatNumber(price)}`;
   };
+
+  useEffect(() => {
+    if (Object.keys(pendingTransactions).length > 0) {
+      setAmountFrom('');
+      setAmountOut('');
+    }
+  }, [pendingTransactions]);
 
   if (loading) return <p>Loading tokens...</p>;
   if (error) return <p>Error loading tokens: {error.message}</p>;
@@ -330,7 +310,7 @@ const SwapForm: React.FC<SwapFormProps> = ({ address }) => {
           <button
             type='button'
             className='w-full rounded-lg bg-blue-600 hover:bg-blue-700 px-4 py-3 text-white text-base'
-            onClick={formik.submitForm} // Formik'in handleSubmit fonksiyonunu burada kullanıyoruz
+            onClick={formik.submitForm} 
           >
             Swap
           </button>

@@ -76,3 +76,11 @@ export interface Pair {
   secondTokenPrice: string;
   __typename: string;
 }
+
+export interface SwapTransactionParams {
+  amountIn: string;
+  selectedFromToken: TokenType;
+  selectedToToken: TokenType;
+  amountOutMin: string;
+  pairAddress: string;
+}

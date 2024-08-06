@@ -2,16 +2,11 @@ import { useEffect, useState } from 'react';
 import { AbiRegistry, SmartContract, Address, BigUIntValue, BytesValue, ArgSerializer } from "@multiversx/sdk-core";
 import { sendTransactions, useGetAccountInfo } from 'lib';
 import { Transaction, TransactionPayload } from "@multiversx/sdk-core";
+import { SwapTransactionParams } from '../types';
 import { SendTransactionsPropsType } from 'types';
-import pairAbi from '../../../abis/pair.abi.json';
 
-interface SwapTransactionParams {
-  amountIn: string;
-  tokenInID: string;
-  tokenOutID: string;
-  amountOutMin: string;
-  pairAddress: string;
-}
+import BigNumber from 'bignumber.js';
+import pairAbi from '../../../abis/pair.abi.json';
 
 export const useSwapTransaction = () => {
   const { account } = useGetAccountInfo();
@@ -32,8 +27,8 @@ export const useSwapTransaction = () => {
 
   const performSwap = async ({
     amountIn,
-    tokenInID,
-    tokenOutID,
+    selectedFromToken,
+    selectedToToken,
     amountOutMin,
     pairAddress,
   }: SwapTransactionParams) => {
@@ -48,11 +43,15 @@ export const useSwapTransaction = () => {
         abi: pairAbiRegistry
       });
 
-      const amountInBigInt = BigInt(amountIn);
-      const amountOutMinBigInt = BigInt(amountOutMin);
+      console.log(amountOutMin);
+      console.log((new BigNumber(amountOutMin).times(new BigNumber(10).pow(selectedFromToken.decimals))).toString());
+      const amountInBigInt = BigInt(new BigNumber(amountIn).times(new BigNumber(10).pow(selectedFromToken.decimals)).toFixed());
+      console.log(amountInBigInt);
+      const amountOutMinBigInt = BigInt(new BigNumber(amountOutMin).times(new BigNumber(10).pow(selectedToToken.decimals)).toFixed());
+      console.log(amountOutMinBigInt);
 
       const esdtTransferArgs = [
-        new BytesValue(Buffer.from(tokenInID, 'utf-8')),
+        new BytesValue(Buffer.from(selectedFromToken.identifier, 'utf-8')),
         new BigUIntValue(amountInBigInt)
       ];
 
@@ -60,7 +59,7 @@ export const useSwapTransaction = () => {
       const { argumentsString: esdtTransferArguments } = esdtTransferSerializer.valuesToString(esdtTransferArgs);
 
       const swapArgs = [
-        new BytesValue(Buffer.from(tokenOutID, 'utf-8')),
+        new BytesValue(Buffer.from(selectedToToken.identifier, 'utf-8')),
         new BigUIntValue(amountOutMinBigInt)
       ];
 

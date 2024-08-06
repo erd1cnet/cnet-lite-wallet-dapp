@@ -1,8 +1,7 @@
 import { GET_TOKENS, GET_USER_BALANCES, SWAP_TOKENS } from './queries';
 
-// api.ts
-const endpoint = 'http://192.168.1.217:3005/graphql'; 
-const balanceApiEndpoint = 'https://testnet-api.cyber.network/accounts'; 
+const endpoint = 'http://192.168.1.217:3005/graphql';
+const balanceApiEndpoint = 'https://testnet-api.cyber.network/accounts';
 
 const fetchGraphQL = async (query: string, variables: any = {}) => {
   try {
@@ -42,7 +41,6 @@ export const executeSwap = async (variables: { amountIn: string, tokenInID: stri
   return data.swap;
 };
 
-// New function to fetch balances from the API
 export const getBalanceFromApi = async (address: string) => {
   try {
     const response = await fetch(`${balanceApiEndpoint}/${address}/tokens?type=FungibleESDT&fields=identifier,balance,decimals`, {
