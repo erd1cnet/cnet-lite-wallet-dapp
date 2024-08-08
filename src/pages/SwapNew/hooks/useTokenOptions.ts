@@ -1,6 +1,6 @@
 // hooks/useTokenOptions.ts
 import { useEffect, useState } from 'react';
-import { fetchTokens } from '../helpers/api';
+import { fetchTokens } from '../helpers';
 import { TokenType } from '../types';
 
 export const useTokenOptions = () => {

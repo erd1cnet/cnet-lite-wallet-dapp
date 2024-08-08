@@ -3,6 +3,9 @@ import { useFormik } from 'formik';
 import { useSwapTransaction, useSwapForm, useTokenOptions } from '../hooks';
 import { TokenType } from '../types';
 import { useGetPendingTransactions } from 'lib';
+import { ImageWithFallback } from '../components'; // Düzenlendi
+import { renderTokenLabel, getBalanceLabel, getBalanceUSD, getPriceLabel } from '../helpers';
+import { DEFAULT_SVG_URL } from 'config';
 
 interface SwapFormProps {
   address: string;
@@ -31,6 +34,8 @@ const SwapForm: React.FC<SwapFormProps> = ({ address }) => {
     setSlippage,
     pairs,
     tokenBalances,
+    tokenRoute,
+    intermediaryAmounts
   } = useSwapForm(address, selectedFromToken, selectedToToken);
 
   const formik = useFormik({
@@ -47,6 +52,10 @@ const SwapForm: React.FC<SwapFormProps> = ({ address }) => {
           selectedToToken,
           amountOutMin,
           pairAddress: pairs[0].address,
+          pairs,
+          tokenRoute,
+          intermediaryAmounts,
+          slippage
         });
       }
     },
@@ -60,35 +69,6 @@ const SwapForm: React.FC<SwapFormProps> = ({ address }) => {
   const handleTokenSelectTo = (token: TokenType) => {
     setSelectedToToken(token);
     setDropdownOpenTo(false);
-  };
-
-  const renderTokenLabel = (token: TokenType) => {
-    return token.assets && token.assets.svgUrl ? token.ticker : token.identifier;
-  };
-
-  const formatNumber = (number: string | number) => {
-    return parseFloat(number.toString()).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-  };
-
-  const getBalanceLabel = (token: TokenType) => {
-    if (Object.keys(pendingTransactions).length > 0) {
-      return '--';
-    }
-    const balance = tokenBalances[token.identifier]?.balance || 0.00;
-    return formatNumber(balance);
-  };
-
-  const getBalanceUSD = (token: TokenType) => {
-    if (Object.keys(pendingTransactions).length > 0) {
-      return '--';
-    }
-    const usdValue = tokenBalances[token.identifier]?.usdValue || 0.00;
-    return formatNumber(usdValue);
-  };
-
-  const getPriceLabel = (token: TokenType) => {
-    const price = parseFloat(token.price || '0.00');
-    return `$${formatNumber(price)}`;
   };
 
   useEffect(() => {
@@ -113,7 +93,7 @@ const SwapForm: React.FC<SwapFormProps> = ({ address }) => {
             <div className='flex justify-between items-center mb-1 mx-1'>
               <span className='text-xs'>Swap From:</span>
               <span className='text-xs'>
-                Balance: {selectedFromToken && getBalanceLabel(selectedFromToken)} {selectedFromToken && renderTokenLabel(selectedFromToken)}
+                Balance: {selectedFromToken && getBalanceLabel(selectedFromToken, tokenBalances, pendingTransactions)} {selectedFromToken && renderTokenLabel(selectedFromToken)}
               </span>
             </div>
             <div className='flex items-center p-3 rounded-xl bg-gray-100'>
@@ -150,19 +130,18 @@ const SwapForm: React.FC<SwapFormProps> = ({ address }) => {
                 <button className='flex items-center'>
                   {selectedFromToken ? (
                     <>
-                      {selectedFromToken.assets && selectedFromToken.assets.svgUrl && (
-                        <img
-                          src={selectedFromToken.assets.svgUrl}
-                          alt={renderTokenLabel(selectedFromToken)}
-                          className='w-6 h-6 mr-2'
-                        />
-                      )}
+                      <ImageWithFallback
+                        src={selectedFromToken.assets && selectedFromToken.assets.svgUrl ? selectedFromToken.assets.svgUrl : DEFAULT_SVG_URL}
+                        alt={renderTokenLabel(selectedFromToken)}
+                        className='w-6 h-6 mr-2' 
+                      />
                       <span>{renderTokenLabel(selectedFromToken)}</span>
                     </>
                   ) : (
                     <span className='text-gray-500'>Select...</span>
                   )}
                 </button>
+
                 {dropdownOpenFrom && (
                   <div className='absolute mt-2 w-64 bg-white border border-gray-200 rounded-md shadow-lg z-10'>
                     {tokens.map((token) => (
@@ -172,21 +151,19 @@ const SwapForm: React.FC<SwapFormProps> = ({ address }) => {
                         onClick={(e) => { e.stopPropagation(); handleTokenSelectFrom(token); }}
                       >
                         <div className='flex items-center'>
-                          {token.assets && token.assets.svgUrl && (
-                            <img
-                              src={token.assets.svgUrl}
-                              alt={token.ticker}
-                              className='w-6 h-6 mr-2'
-                            />
-                          )}
+                          <ImageWithFallback
+                            src={token.assets && token.assets.svgUrl ? token.assets.svgUrl : DEFAULT_SVG_URL}
+                            alt={token.ticker}
+                            className='w-6 h-6 mr-2'
+                          />
                           <div className='flex flex-col'>
                             <span>{renderTokenLabel(token)}</span>
                             <span className='text-gray-500 text-xs'>{getPriceLabel(token)}</span>
                           </div>
                         </div>
                         <div className='flex flex-col items-end'>
-                          <span>{getBalanceLabel(token)}</span>
-                          <span className='text-gray-500 text-xs'>${getBalanceUSD(token)}</span>
+                          <span>{getBalanceLabel(token, tokenBalances, pendingTransactions)}</span>
+                          <span className='text-gray-500 text-xs'>${getBalanceUSD(token, tokenBalances, pendingTransactions)}</span>
                         </div>
                       </button>
                     ))}
@@ -196,7 +173,7 @@ const SwapForm: React.FC<SwapFormProps> = ({ address }) => {
             </div>
             {selectedFromToken && (
               <div className='text-xs text-gray-600'>
-                Total Value: ${getBalanceUSD(selectedFromToken)}
+                Total Value: ${getBalanceUSD(selectedFromToken, tokenBalances, pendingTransactions)}
               </div>
             )}
           </div>
@@ -209,7 +186,7 @@ const SwapForm: React.FC<SwapFormProps> = ({ address }) => {
             <div className='flex justify-between items-center mb-1 mx-1'>
               <span className='text-xs'>Swap To:</span>
               <span className='text-xs'>
-                Balance: {selectedToToken && getBalanceLabel(selectedToToken)} {selectedToToken && renderTokenLabel(selectedToToken)}
+                Balance: {selectedToToken && getBalanceLabel(selectedToToken, tokenBalances, pendingTransactions)} {selectedToToken && renderTokenLabel(selectedToToken)}
               </span>
             </div>
             <div className='flex items-center p-3 rounded-xl bg-gray-100'>
@@ -236,13 +213,11 @@ const SwapForm: React.FC<SwapFormProps> = ({ address }) => {
                 >
                   {selectedToToken ? (
                     <>
-                      {selectedToToken.assets && selectedToToken.assets.svgUrl && (
-                        <img
-                          src={selectedToToken.assets.svgUrl}
-                          alt={renderTokenLabel(selectedToToken)}
-                          className='w-6 h-6 mr-2'
-                        />
-                      )}
+                      <ImageWithFallback
+                        src={selectedToToken.assets && selectedToToken.assets.svgUrl ? selectedToToken.assets.svgUrl : DEFAULT_SVG_URL}
+                        alt={renderTokenLabel(selectedToToken)}
+                        className='w-6 h-6 mr-2'
+                      />
                       <span>{renderTokenLabel(selectedToToken)}</span>
                     </>
                   ) : (
@@ -260,21 +235,19 @@ const SwapForm: React.FC<SwapFormProps> = ({ address }) => {
                           onClick={(e) => { e.stopPropagation(); handleTokenSelectTo(token); }}
                         >
                           <div className='flex items-center'>
-                            {token.assets && token.assets.svgUrl && (
-                              <img
-                                src={token.assets.svgUrl}
-                                alt={token.ticker}
-                                className='w-6 h-6 mr-2'
-                              />
-                            )}
+                            <ImageWithFallback
+                              src={token.assets && token.assets.svgUrl ? token.assets.svgUrl : DEFAULT_SVG_URL}
+                              alt={token.ticker}
+                              className='w-6 h-6 mr-2'
+                            />
                             <div className='flex flex-col'>
                               <span>{renderTokenLabel(token)}</span>
                               <span className='text-gray-500 text-xs'>{getPriceLabel(token)}</span>
                             </div>
                           </div>
                           <div className='flex flex-col items-end'>
-                            <span>{getBalanceLabel(token)}</span>
-                            <span className='text-gray-500 text-xs'>${getBalanceUSD(token)}</span>
+                            <span>{getBalanceLabel(token, tokenBalances, pendingTransactions)}</span>
+                            <span className='text-gray-500 text-xs'>${getBalanceUSD(token, tokenBalances, pendingTransactions)}</span>
                           </div>
                         </button>
                       ))}
@@ -284,7 +257,7 @@ const SwapForm: React.FC<SwapFormProps> = ({ address }) => {
             </div>
             {selectedToToken && (
               <div className='text-xs text-gray-600'>
-                Total Value: ${getBalanceUSD(selectedToToken)}
+                Total Value: ${getBalanceUSD(selectedToToken, tokenBalances, pendingTransactions)}
               </div>
             )}
           </div>

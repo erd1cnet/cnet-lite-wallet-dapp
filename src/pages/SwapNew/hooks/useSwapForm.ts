@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { getBalanceFromApi, executeSwap, fetchTokens } from '../helpers/api';
+import { getBalanceFromApi, executeSwap, fetchTokens } from '../helpers';
 import { TokenType } from '../types';
 import { useGetPendingTransactions } from 'lib';
 import BigNumber from 'bignumber.js';
@@ -15,6 +15,8 @@ export const useSwapForm = (address: string, selectedFromToken: TokenType | null
   const [pairs, setPairs] = useState<{ address: string }[]>([]);
   const { pendingTransactions } = useGetPendingTransactions();
   const [tokenBalances, setTokenBalances] = useState<Record<string, { balance: number; usdValue: number }>>({});
+  const [tokenRoute, setTokenRoute] = useState<string[]>([]);
+  const [intermediaryAmounts, setIntermediaryAmounts] = useState<string[]>([]);
 
   useEffect(() => {
     const fetchBalances = async () => {
@@ -32,7 +34,6 @@ export const useSwapForm = (address: string, selectedFromToken: TokenType | null
 
           const balancesMap = balancesData.reduce((acc: Record<string, { balance: BigNumber; usdValue: number }>, token: any) => {
             const balance = new BigNumber(token.balance).dividedBy(new BigNumber(10).pow(token.decimals));
-            console.log(balance.toString());
             const price = new BigNumber(tokensMap[token.identifier]?.price || 0.00);
             const usdValue = balance.multipliedBy(price).toNumber();
             acc[token.identifier] = { balance, usdValue };
@@ -68,6 +69,9 @@ export const useSwapForm = (address: string, selectedFromToken: TokenType | null
             setFees(response.fees);
             setPriceImpact(parseFloat(response.pricesImpact[0]));
             setPairs(response.pairs);
+            setTokenRoute(response.tokenRoute);
+            setIntermediaryAmounts(response.intermediaryAmounts);
+
           } else {
             console.error('Error: response is undefined');
           }
@@ -92,5 +96,7 @@ export const useSwapForm = (address: string, selectedFromToken: TokenType | null
     setSlippage,
     pairs,
     tokenBalances,
+    tokenRoute,
+    intermediaryAmounts
   };
 };

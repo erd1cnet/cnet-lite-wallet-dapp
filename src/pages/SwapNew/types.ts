@@ -83,4 +83,8 @@ export interface SwapTransactionParams {
   selectedToToken: TokenType;
   amountOutMin: string;
   pairAddress: string;
+  pairs: { address: string }[];
+  tokenRoute: string[];
+  intermediaryAmounts: string[];
+  slippage: number
 }
