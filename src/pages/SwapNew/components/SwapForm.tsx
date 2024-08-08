@@ -3,7 +3,7 @@ import { useFormik } from 'formik';
 import { useSwapTransaction, useSwapForm, useTokenOptions } from '../hooks';
 import { TokenType } from '../types';
 import { useGetPendingTransactions } from 'lib';
-import { ImageWithFallback } from '../components'; // Düzenlendi
+import { ImageWithFallback } from '../components'; 
 import { renderTokenLabel, getBalanceLabel, getBalanceUSD, getPriceLabel } from '../helpers';
 import { DEFAULT_SVG_URL } from 'config';
 
@@ -70,6 +70,23 @@ const SwapForm: React.FC<SwapFormProps> = ({ address }) => {
     setSelectedToToken(token);
     setDropdownOpenTo(false);
   };
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownFromRef.current && !dropdownFromRef.current.contains(event.target as Node)) {
+        setDropdownOpenFrom(false);
+      }
+      if (dropdownToRef.current && !dropdownToRef.current.contains(event.target as Node)) {
+        setDropdownOpenTo(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+  
 
   useEffect(() => {
     if (Object.keys(pendingTransactions).length > 0) {
@@ -154,7 +171,7 @@ const SwapForm: React.FC<SwapFormProps> = ({ address }) => {
                           <ImageWithFallback
                             src={token.assets && token.assets.svgUrl ? token.assets.svgUrl : DEFAULT_SVG_URL}
                             alt={token.ticker}
-                            className='w-6 h-6 mr-2'
+                            className='w-6 h-6 mr-2' 
                           />
                           <div className='flex flex-col'>
                             <span>{renderTokenLabel(token)}</span>
