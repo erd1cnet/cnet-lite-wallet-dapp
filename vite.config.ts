@@ -10,7 +10,7 @@ export default defineConfig({
     port: Number(process.env.PORT) || 3000,
     strictPort: true,
     host: true,
-    https: true,
+    https: false, // HTTPS'yi devre dışı bırakmak için false yapın
     watch: {
       usePolling: false,
       useFsEvents: false
@@ -21,7 +21,6 @@ export default defineConfig({
   },
   plugins: [
     react(),
-    basicSsl(),
     tsconfigPaths(),
     svgrPlugin(),
     nodePolyfills({
@@ -33,7 +32,7 @@ export default defineConfig({
   },
   preview: {
     port: 3002,
-    https: true,
+    https: false, // HTTPS'yi devre dışı bırakmak için false yapın
     host: 'localhost',
     strictPort: true
   }

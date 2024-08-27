@@ -1,350 +1,429 @@
 import { useState, useEffect } from 'react';
-import {
-  faSwimmingPool,
-  faCheckCircle
-} from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { useNavigate } from 'react-router-dom';
-import { routeNames } from 'routes';
-import ProgressBar from './ProgressBar';
-import { useGetLoginInfo } from 'lib';
+import { useCreatePoolForm, useCreatePoolsTransaction } from '../hooks';
+import ImageWithFallback from '../components/ImageWithFallback';
+import BigNumber from 'bignumber.js';
+import { checkPairExistence, getFromLocalStorage, pollTransactionStatus, updateStorage } from '../helpers';
 
 const CreatePool = () => {
-  const [step, setStep] = useState(1);
-  const navigate = useNavigate();
-  const { tokenLogin } = useGetLoginInfo();
+  const { filteredUserTokens, commonTokens } = useCreatePoolForm();
+  const {
+    createPair,
+    issueLpToken,
+    setLocalRoles,
+    addInitialLiquidity,
+    setSwapEnabledByUser
+  } = useCreatePoolsTransaction();
+  const DEFAULT_SVG_URL = '/src/assets/img/default.svg';
+
+  const [selectedUserToken, setSelectedUserToken] = useState<string>('');
+  const [selectedCommonToken, setSelectedCommonToken] = useState<string>('');
+  const [pairExists, setPairExists] = useState(false);
+  const [canContinue, setCanContinue] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [transactionPending, setTransactionPending] = useState(false);
+  const [transactionHash, setTransactionHash] = useState<string | null>(null);
+  const [currentStep, setCurrentStep] = useState<string | null>(null);
+
+  const [dropdownOpenUser, setDropdownOpenUser] = useState(false);
+  const [dropdownOpenCommon, setDropdownOpenCommon] = useState(false);
+
+  const storedData = getFromLocalStorage('poolCreation');
 
   useEffect(() => {
-    const fetchUserTokens = async () => {
-      if (tokenLogin?.nativeAuthToken) {
+    if (filteredUserTokens.length > 0) {
+      setSelectedUserToken(filteredUserTokens[0].identifier);
+    }
+    if (commonTokens.length > 0) {
+      setSelectedCommonToken(commonTokens[0].identifier);
+    }
+  }, [filteredUserTokens, commonTokens]);
+
+  useEffect(() => {
+    const checkPair = async () => {
+      if (selectedUserToken && selectedCommonToken) {
         try {
-          const response = await fetch('http://192.168.1.132:3005/graphql', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${tokenLogin.nativeAuthToken}`,
-              'Accept': '*/*',
-              'Accept-Encoding': 'gzip, deflate, br',
-              'Accept-Language': 'en-US,en;q=0.5',
-              'Origin': 'http://192.168.1.132:3000',
-              'Referer': 'http://192.168.1.132:3000/',
-              'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:128.0) Gecko/20100101 Firefox/128.0',
-              'Connection': 'keep-alive',
-              'Priority': 'u=4'
-            },
-            body: JSON.stringify({
-              query: `
-                query GetUserTokens($offset: Int, $limit: Int) {
-                  userTokens(offset: $offset, limit: $limit) {
-                    identifier
-                    balance
-                  }
-                }
-              `,
-              variables: {
-                offset: 0,
-                limit: 10
-              }
-            })
-          });
+          const { falsePair, truePair } = await checkPairExistence(selectedUserToken, selectedCommonToken);
 
-          if (!response.ok) {
-            throw new Error('Network response was not ok');
-          }
-
-          const data = await response.json();
-
-          if (data.errors) {
-            console.error('GraphQL Errors:', data.errors);
+          if (falsePair.length > 0 && truePair.length === 0) {
+            setPairExists(true);
+            setCanContinue(true);
+            setErrorMessage('Pair already exists. You can continue with issuing the LP token.');
+          } else if (falsePair.length > 0 && truePair.length > 0) {
+            setPairExists(true);
+            setCanContinue(false);
+            setErrorMessage('Pair already exists with an issued LP token.');
           } else {
-            console.log('User Tokens:', data.data);
+            setPairExists(false);
+            setCanContinue(false);
+            setErrorMessage(null);
           }
         } catch (error) {
-          console.error('Error fetching user tokens:', error);
+          console.error('Error checking pair existence:', error);
+          setErrorMessage('Error checking pair existence');
         }
       }
     };
 
-    fetchUserTokens();
-  }, [tokenLogin]);
+    checkPair();
+  }, [selectedUserToken, selectedCommonToken]);
 
-  const handleNext = () => {
-    if (step < 5) {
-      setStep(step + 1);
-    } else {
-      // Handle form submission or completion
+  useEffect(() => {
+    if (storedData) {
+      setCurrentStep(storedData.data.step);
     }
-  };
+  }, [storedData]);
 
-  const handleBack = () => {
-    if (step > 1) {
-      setStep(step - 1);
-    } else {
-      navigate(routeNames.listToken);
-    }
-  };
+  useEffect(() => {
+    const monitorTransactionStatus = async () => {
+      if (transactionPending && transactionHash) {
+        const transactionStatus = await pollTransactionStatus(transactionHash);
 
-  const getTitle = () => {
-    switch (step) {
-      case 1:
-        return 'Generate Pool Address';
-      case 2:
-        return 'Create LP Token';
-      case 3:
-        return 'Set LP Token Roles';
-      case 4:
-        return 'Add Initial Liquidity';
-      case 5:
-        return 'Liquidity pool successfully created!';
+        if (transactionStatus?.status.isExecuted) {
+          handleSuccess();
+        } else if (transactionStatus?.status.isFailed) {
+          handleFailure();
+        } else {
+          setTimeout(monitorTransactionStatus, 1000); 
+        }
+      }
+    };
+
+    monitorTransactionStatus();
+  }, [transactionPending, transactionHash]);
+
+  const handleSuccess = () => {
+    setTransactionPending(false);
+    switch (currentStep) {
+      case null:
+        setCurrentStep('2_issueLpToken');
+        updateStorage('poolCreation', { step: '2_issueLpToken', pairAddress: transactionHash });
+        break;
+      case '2_issueLpToken':
+        setCurrentStep('3_setRoles');
+        updateStorage('poolCreation', { step: '3_setRoles' });
+        break;
+      case '3_setRoles':
+        setCurrentStep('4_addLiquidity');
+        updateStorage('poolCreation', { step: '4_addLiquidity' });
+        break;
+      case '4_addLiquidity':
+        setCurrentStep('5_enableSwap');
+        updateStorage('poolCreation', { step: '5_enableSwap' });
+        break;
+      case '5_enableSwap':
+        setCurrentStep(null); 
+        localStorage.removeItem('poolCreation');
+        break;
       default:
-        return '';
+        break;
     }
+  };
+
+  const handleFailure = () => {
+    setTransactionPending(false);
+    setErrorMessage('Transaction failed or not completed.');
+  };
+
+  const handleTokenSelectUser = (identifier: string) => {
+    setSelectedUserToken(identifier);
+    setDropdownOpenUser(false);
+  };
+
+  const handleTokenSelectCommon = (identifier: string) => {
+    setSelectedCommonToken(identifier);
+    setDropdownOpenCommon(false);
+  };
+
+  const handleGeneratePoolAddress = async () => {
+    try {
+      const selectedUserTokenObj = filteredUserTokens.find(token => token.identifier === selectedUserToken);
+      const selectedCommonTokenObj = commonTokens.find(token => token.identifier === selectedCommonToken);
+
+      if (selectedUserTokenObj && selectedCommonTokenObj) {
+        const hash = await createPair({
+          firstTokenId: selectedUserTokenObj.identifier,
+          secondTokenId: selectedCommonTokenObj.identifier,
+          optFeePercents: [0, 0],
+        });
+        console.log("firat",hash);
+        if (hash) {
+          setTransactionHash(hash);
+          setTransactionPending(true);
+        }
+      }
+    } catch (error) {
+      console.error('Error generating pool address:', error);
+      setErrorMessage('Error generating pool address');
+    }
+  };
+
+  const handleIssueLpToken = async () => {
+    if (storedData && storedData.data.pairAddress) {
+      const { pairAddress } = storedData.data;
+      const selectedUserTokenObj = filteredUserTokens.find(token => token.identifier === selectedUserToken);
+      const selectedCommonTokenObj = commonTokens.find(token => token.identifier === selectedCommonToken);
+
+      if (selectedUserTokenObj && selectedCommonTokenObj) {
+        const hash = await issueLpToken(pairAddress, selectedUserTokenObj.ticker, selectedCommonTokenObj.ticker);
+
+        if (hash) {
+          setTransactionHash(hash);
+          setTransactionPending(true);
+        }
+      }
+    }
+  };
+
+  const handleSetLocalRoles = async () => {
+    if (storedData && storedData.data.pairAddress) {
+      const { pairAddress } = storedData.data;
+      const hash = await setLocalRoles(pairAddress);
+
+      if (hash) {
+        setTransactionHash(hash);
+        setTransactionPending(true);
+      }
+    }
+  };
+
+  const handleAddInitialLiquidity = async () => {
+    if (storedData && storedData.data.pairAddress) {
+      const { pairAddress } = storedData.data;
+      const selectedUserTokenObj = filteredUserTokens.find(token => token.identifier === selectedUserToken);
+      const selectedCommonTokenObj = commonTokens.find(token => token.identifier === selectedCommonToken);
+
+      if (selectedUserTokenObj && selectedCommonTokenObj) {
+        const hash = await addInitialLiquidity(pairAddress, selectedUserTokenObj.identifier, '1000000', selectedCommonTokenObj.identifier, '2000000');
+
+        if (hash) {
+          setTransactionHash(hash);
+          setTransactionPending(true);
+        }
+      }
+    }
+  };
+
+  const handleEnableSwap = async () => {
+    if (storedData && storedData.data.pairAddress) {
+      const { pairAddress } = storedData.data;
+      const hash = await setSwapEnabledByUser(pairAddress);
+
+      if (hash) {
+        setTransactionHash(hash);
+        setTransactionPending(true);
+      }
+    }
+  };
+
+  const handleContinue = async () => {
+    switch (currentStep) {
+      case null:
+        await handleGeneratePoolAddress();
+        break;
+      case '2_issueLpToken':
+        await handleIssueLpToken();
+        break;
+      case '3_setRoles':
+        await handleSetLocalRoles();
+        break;
+      case '4_addLiquidity':
+        await handleAddInitialLiquidity();
+        break;
+      case '5_enableSwap':
+        await handleEnableSwap();
+        break;
+      default:
+        break;
+    }
+  };
+
+  const formatBalance = (balance: number, decimals: number) => {
+    const formatted = new BigNumber(balance).dividedBy(new BigNumber(10).pow(decimals));
+    return formatted.toFormat(2);
   };
 
   return (
     <div className='flex flex-col p-6 max-w-2xl w-full bg-white shadow-md rounded h-full items-center'>
       <h2 className='text-2xl font-bold p-2'>Create Pool</h2>
-      <p className='text-gray-400 mb-8'>
-        Create pools using the tokens you minted.
-      </p>
+      <p className='text-gray-400 mb-8'>Create pools using the tokens you minted.</p>
       <div className='p-6 rounded-lg border border-gray-200 shadow-xl w-full max-w-md'>
-        <h3 className='text-xl font-semibold mb-4 text-center'>{getTitle()}</h3>
-        {step < 5 && <ProgressBar step={step} />}
-        {step === 1 && (
+        {currentStep === null && (
           <>
-            <p className='text-gray-400 text-center mb-4'>
-              You must be the creator of the tokens and also brand them.
-              Branding details can be found{' '}
-              <a href='#' className='text-blue-500'>
-                here
-              </a>
-              .
-            </p>
             <div className='space-y-4'>
-              <select className='w-full flex items-center p-3 rounded-xl bg-gray-100'>
-                <option value=''>ARWEN-4f5052</option>
-              </select>
+              <div className='relative'>
+                <button
+                  className={`w-full p-3 rounded-xl bg-gray-100 flex items-center justify-between ${transactionPending && 'opacity-50 cursor-not-allowed'}`}
+                  onClick={() => !transactionPending && setDropdownOpenUser(!dropdownOpenUser)}
+                  disabled={transactionPending}
+                >
+                  {selectedUserToken ? (
+                    <>
+                      <ImageWithFallback
+                        src={filteredUserTokens.find(token => token.identifier === selectedUserToken)?.assets?.svgUrl || DEFAULT_SVG_URL}
+                        alt={filteredUserTokens.find(token => token.identifier === selectedUserToken)?.ticker || selectedUserToken}
+                        className='w-6 h-6 mr-2'
+                      />
+                      <span>
+                        {filteredUserTokens.find(token => token.identifier === selectedUserToken)?.ticker || selectedUserToken}
+                      </span>
+                    </>
+                  ) : (
+                    <span className='text-gray-500'>Select a token</span>
+                  )}
+                  <span className='ml-auto'>▼</span>
+                </button>
+                {dropdownOpenUser && (
+                  <div className='absolute mt-2 w-full bg-white border border-gray-200 rounded-md shadow-lg z-10'>
+                    {filteredUserTokens.map(token => (
+                      <button
+                        key={token.identifier}
+                        className='flex items-center justify-between w-full px-4 py-2 text-left hover:bg-gray-100'
+                        onClick={() => handleTokenSelectUser(token.identifier)}
+                      >
+                        <div className='flex items-center'>
+                          <ImageWithFallback
+                            src={token.assets?.svgUrl || DEFAULT_SVG_URL}
+                            alt={token.ticker || token.identifier}
+                            className='w-6 h-6 mr-2'
+                          />
+                          <span>{token.ticker || token.identifier}</span>
+                        </div>
+                        <div className='text-right'>
+                          <span>{formatBalance(Number(token.balance), token.decimals)}</span>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
               <div className='flex justify-center mb-2'>
                 <span className='text-2xl'>+</span>
               </div>
-              <select className='w-full flex items-center p-3 rounded-xl bg-gray-100'>
-                <option value=''>WCNET</option>
-              </select>
-              <button className='w-full rounded-lg bg-blue-600 hover:bg-blue-700 px-4 py-3 text-white text-base'>
-                Generate Pool Address
-              </button>
+              <div className='relative'>
+                <button
+                  className={`w-full p-3 rounded-xl bg-gray-100 flex items-center justify-between ${transactionPending && 'opacity-50 cursor-not-allowed'}`}
+                  onClick={() => !transactionPending && setDropdownOpenCommon(!dropdownOpenCommon)}
+                  disabled={transactionPending}
+                >
+                  {selectedCommonToken ? (
+                    <>
+                      <ImageWithFallback
+                        src={commonTokens.find(token => token.identifier === selectedCommonToken)?.assets?.svgUrl || DEFAULT_SVG_URL}
+                        alt={commonTokens.find(token => token.identifier === selectedCommonToken)?.ticker || selectedCommonToken}
+                        className='w-6 h-6 mr-2'
+                      />
+                      <span>
+                        {commonTokens.find(token => token.identifier === selectedCommonToken)?.ticker || selectedCommonToken}
+                      </span>
+                    </>
+                  ) : (
+                    <span className='text-gray-500'>Select a token</span>
+                  )}
+                  <span className='ml-auto'>▼</span>
+                </button>
+                {dropdownOpenCommon && (
+                  <div className='absolute mt-2 w-full bg-white border border-gray-200 rounded-md shadow-lg z-10'>
+                    {commonTokens.map(token => (
+                      <button
+                        key={token.identifier}
+                        className='flex items-center justify-between w-full px-4 py-2 text-left hover:bg-gray-100'
+                        onClick={() => handleTokenSelectCommon(token.identifier)}
+                      >
+                        <div className='flex items-center'>
+                          <ImageWithFallback
+                            src={token.assets?.svgUrl || DEFAULT_SVG_URL}
+                            alt={token.ticker || token.identifier}
+                            className='w-6 h-6 mr-2'
+                          />
+                          <span>{token.ticker || token.identifier}</span>
+                        </div>
+                        <div className='text-right'>
+                          <span>{formatBalance(Number(token.balance), token.decimals)}</span>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+              {errorMessage && (
+                <p className="text-red-500 text-center mt-2">{errorMessage}</p>
+              )}
+              {canContinue && (
+                <button
+                  className='w-full rounded-lg bg-green-600 hover:bg-green-700 px-4 py-3 text-white text-base'
+                  onClick={handleContinue}
+                  disabled={transactionPending}
+                >
+                  {transactionPending ? 'Processing...' : 'Continue'}
+                </button>
+              )}
+              {!storedData && !canContinue && (
+                <button
+                  className='w-full rounded-lg bg-blue-600 hover:bg-blue-700 px-4 py-3 text-white text-base'
+                  onClick={handleGeneratePoolAddress}
+                  disabled={pairExists || transactionPending}
+                >
+                  {transactionPending ? 'Processing...' : 'Generate Pool Address'}
+                </button>
+              )}
             </div>
           </>
         )}
-        {step === 2 && (
+
+        {currentStep === '2_issueLpToken' && (
           <div className='space-y-4'>
-            <div className='relative'>
-              <label className='block text-gray-700'>Pool Address</label>
-              <input
-                type='text'
-                className='w-full p-3 rounded-xl bg-gray-100'
-                value='erd1qqq...rt89kh'
-                readOnly
-              />
-              <button className='absolute right-4 top-10 text-gray-500'>
-                <i className='fa fa-copy'></i>
-              </button>
+            <div>
+              <label>Pool Address</label>
+              <input type="text" value={storedData.data.pairAddress} readOnly className="w-full p-3 rounded-lg bg-gray-100"/>
             </div>
-            <div className='relative'>
-              <label className='block text-gray-700'>LP Token Name</label>
-              <input
-                type='text'
-                className='w-full p-3 rounded-xl bg-gray-100'
-                value='ARWENWCNETLP'
-                readOnly
-              />
-              <button className='absolute right-4 top-10 text-gray-500'>
-                <i className='fa fa-copy'></i>
-              </button>
+            <div>
+              <label>LP Token Display Name</label>
+              <input type="text" value={`${storedData.data.firstToken}${storedData.data.secondToken}`} readOnly className="w-full p-3 rounded-lg bg-gray-100"/>
             </div>
-            <div className='relative'>
-              <label className='block text-gray-700'>LP Token Ticker</label>
-              <input
-                type='text'
-                className='w-full p-3 rounded-xl bg-gray-100'
-                value='ARWENWCNET'
-                readOnly
-              />
-              <button className='absolute right-4 top-10 text-gray-500'>
-                <i className='fa fa-copy'></i>
-              </button>
+            <div>
+              <label>LP Token Ticker</label>
+              <input type="text" value={`${storedData.data.firstToken}${storedData.data.secondToken}LP`} readOnly className="w-full p-3 rounded-lg bg-gray-100"/>
             </div>
-            <button className='w-full rounded-lg bg-blue-600 hover:bg-blue-700 px-4 py-3 text-white text-base'>
-              Create LP Token
+            <button
+              className='w-full rounded-lg bg-orange-600 hover:bg-orange-700 px-4 py-3 text-white text-base'
+              onClick={handleIssueLpToken}
+              disabled={transactionPending}
+            >
+              {transactionPending ? 'Processing...' : 'Issue LP Token'}
             </button>
           </div>
         )}
-        {step === 3 && (
-          <div className='text-center'>
-            <FontAwesomeIcon
-              icon={faSwimmingPool}
-              className='h-24 w-24 mx-auto mb-4'
-            />
-            <div className='text-gray-600 mb-4'>
-              <p>LP Token</p>
-              <p className='font-bold'>ARWENWCNET-e5366a</p>
-            </div>
-            <div className='w-full mb-4 relative'>
-              <input
-                type='text'
-                className='w-full p-3 rounded-xl bg-gray-100 text-center'
-                value='erd1qqq...rt89kh'
-                readOnly
-              />
-              <button className='absolute right-4 top-2 text-gray-500'>
-                <i className='fa fa-copy'></i>
-              </button>
-            </div>
-            <button className='w-full rounded-lg bg-blue-600 hover:bg-blue-700 px-4 py-3 text-white text-base'>
-              Set LP Token Roles
-            </button>
-          </div>
+
+        {currentStep === '3_setRoles' && (
+          <button
+            className='w-full rounded-lg bg-purple-600 hover:bg-purple-700 px-4 py-3 text-white text-base'
+            onClick={handleSetLocalRoles}
+            disabled={transactionPending}
+          >
+            {transactionPending ? 'Processing...' : 'Set Roles'}
+          </button>
         )}
-        {step === 4 && (
-          <div className='space-y-4'>
-            <div className='relative'>
-              <label className='block text-gray-700'>Pool Address</label>
-              <input
-                type='text'
-                className='w-full p-3 rounded-xl bg-gray-100'
-                value='erd1qqq...rt89kh'
-                readOnly
-              />
-              <button className='absolute right-4 top-10 text-gray-500'>
-                <i className='fa fa-copy'></i>
-              </button>
-            </div>
-            <div className='relative'>
-              <label className='block text-gray-700'>LP Token Roles</label>
-              <input
-                type='text'
-                className='w-full p-3 rounded-xl bg-gray-100'
-                value='LP Token Roles'
-                readOnly
-              />
-              <FontAwesomeIcon
-                icon={faCheckCircle}
-                className='absolute right-4 top-10 text-green-500'
-              />
-            </div>
-            <div className='relative'>
-              <label className='block text-gray-700'>
-                ARWEN-4f5052 Initial Liquidity
-              </label>
-              <div className='flex items-center p-3 rounded-xl bg-gray-100'>
-                <input
-                  type='number'
-                  placeholder='Amount'
-                  className='bg-transparent pl-3 text-black flex-grow outline-none no-arrows'
-                  style={{ minWidth: '0' }}
-                />
-                <button className='bg-blue-500 text-white text-xs px-3 py-1 rounded-full ml-2'>
-                  MAX
-                </button>
-                <span className='ml-2 text-gray-500'>balance</span>
-              </div>
-            </div>
-            <div className='relative'>
-              <label className='block text-gray-700'>
-                WCNET Initial Liquidity
-              </label>
-              <div className='flex items-center p-3 rounded-xl bg-gray-100'>
-                <input
-                  type='number'
-                  placeholder='Amount'
-                  className='bg-transparent pl-3 text-black flex-grow outline-none no-arrows'
-                  style={{ minWidth: '0' }}
-                />
-                <button className='bg-blue-500 text-white text-xs px-3 py-1 rounded-full ml-2'>
-                  MAX
-                </button>
-                <span className='ml-2 text-gray-500'>balance</span>
-              </div>
-            </div>
-            <div className='mt-4'>
-              <label className='text-sm text-gray-700'>Exchange Rate:</label>
-              <p className='text-gray-500'>1 ARWEN-4f5052 = 0.0025 WCNET</p>
-              <p className='text-gray-500'>1 WCNET = 400 ARWEN-4f5052</p>
-            </div>
-            <div className='text-yellow-600 bg-yellow-100 p-3 rounded-xl mt-4'>
-              <p className='font-semibold'>
-                You are the first Liquidity Provider
-              </p>
-              <p className='text-sm'>
-                The ratio of tokens you add will set the price of this pool.
-                Once you are happy with the rate, continue with adding the
-                initial liquidity.
-              </p>
-            </div>
-            <button className='w-full rounded-lg bg-blue-600 hover:bg-blue-700 px-4 py-3 text-white text-base'>
-              Add Initial Liquidity
-            </button>
-          </div>
+
+        {currentStep === '4_addLiquidity' && (
+          <button
+            className='w-full rounded-lg bg-teal-600 hover:bg-teal-700 px-4 py-3 text-white text-base'
+            onClick={handleAddInitialLiquidity}
+            disabled={transactionPending}
+          >
+            {transactionPending ? 'Processing...' : 'Add Initial Liquidity'}
+          </button>
         )}
-        {step === 5 && (
-          <div className='space-y-4 text-center'>
-            <div className='flex flex-col items-center'>
-              <FontAwesomeIcon
-                icon={faCheckCircle}
-                className='h-16 w-16 text-green-500 mb-5'
-              />
-              <div className='border-dashed border-2 px-6 py-2 border-green-500 rounded-2xl'>
-                <span>ARWEN-4f5052 / WCNET</span>
-              </div>
-            </div>
-            <div className='relative'>
-              <label className='block text-gray-700'>Pool Address</label>
-              <input
-                type='text'
-                className='w-full p-3 rounded-xl bg-gray-100'
-                value='erd1qqq...rt89kh'
-                readOnly
-              />
-              <button className='absolute right-4 top-10 text-gray-500'>
-                <i className='fa fa-copy'></i>
-              </button>
-            </div>
-            <div className='relative'>
-              <label className='block text-gray-700'>Token Identifier</label>
-              <input
-                type='text'
-                className='w-full p-3 rounded-xl bg-gray-100'
-                value='ARWEN-4f5052'
-                readOnly
-              />
-              <button className='absolute right-4 top-10 text-gray-500'>
-                <i className='fa fa-copy'></i>
-              </button>
-            </div>
-            <div className='flex justify-between mt-4'>
-              <button className='bg-gray-200 hover:bg-gray-300 text-black px-4 py-2 rounded'>
-                Enable Trade
-              </button>
-              <button className='bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded'>
-                Done
-              </button>
-            </div>
-          </div>
+
+        {currentStep === '5_enableSwap' && (
+          <button
+            className='w-full rounded-lg bg-red-600 hover:bg-red-700 px-4 py-3 text-white text-base'
+            onClick={handleEnableSwap}
+            disabled={transactionPending}
+          >
+            {transactionPending ? 'Processing...' : 'Enable Swap'}
+          </button>
         )}
       </div>
-      {step < 5 && (
-        <div className='flex justify-between w-full mt-4'>
-          <button className='text-blue-500' onClick={handleBack}>
-            « Back
-          </button>
-          <button
-            className='bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded'
-            onClick={handleNext}
-          >
-            {step < 4 ? 'Next' : 'Finish'}
-          </button>
-        </div>
-      )}
     </div>
   );
 };

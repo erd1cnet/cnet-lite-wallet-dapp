@@ -1,3 +1,4 @@
+import { CreatePool } from 'pages/ListToken/CreatePool';
 import { PrivateKeyCheckWrapper } from 'components/PrivateKeyCheckWrapper/PrivateKeyCheckWrapper';
 import { HooksPageEnum, RouteNamesEnum } from 'localConstants';
 import {
@@ -14,8 +15,7 @@ import {
   Swap,
   Faucet,
   ListToken,
-  CreatePool,
-  SwapNew // Import the SwapNew component
+  SwapNew 
 } from 'pages';
 import { Send } from 'pages/Send/Send';
 import { Sign } from 'pages/Sign/Sign';

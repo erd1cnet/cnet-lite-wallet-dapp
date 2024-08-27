@@ -21,8 +21,6 @@ export const useSwapTransaction = () => {
   useEffect(() => {
     const loadAbi = async () => {
       try {
-
-
         const pairRegistry = AbiRegistry.create(pairAbi);
         const routerRegistry = AbiRegistry.create(routerAbi);
 

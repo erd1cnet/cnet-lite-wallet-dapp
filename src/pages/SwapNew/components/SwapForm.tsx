@@ -86,7 +86,6 @@ const SwapForm: React.FC<SwapFormProps> = ({ address }) => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, []);
-  
 
   useEffect(() => {
     if (Object.keys(pendingTransactions).length > 0) {
