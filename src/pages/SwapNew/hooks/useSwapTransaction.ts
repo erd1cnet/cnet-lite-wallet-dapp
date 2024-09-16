@@ -6,7 +6,7 @@ import { SwapTransactionParams, TokenType } from '../types';
 import { SendTransactionsPropsType } from 'types';
 
 import BigNumber from 'bignumber.js';
-import { ROUTER_SC, SINGLE_SWAP_GAS_FEE, MULTİ_PAİR_GAS_FEE } from 'config';
+import { ROUTER_SC, SINGLE_SWAP_GAS_FEE, MULTI_PAIR_GAS_FEE } from 'config';
 
 import pairAbi from 'abis/pair.abi.json';
 import routerAbi from 'abis/router.abi.json';
@@ -115,7 +115,7 @@ export const useSwapTransaction = () => {
   ) => {
     const multiPairSwapFunctionHex = BytesValue.fromUTF8('multiPairSwap').valueOf().toString('hex');
     const payload = `ESDTTransfer@${esdtTransferArguments}@${multiPairSwapFunctionHex}@${multiPairSwapArguments}`;
-    const transaction = createTransaction(account.address, routerContract.getAddress(), payload, MULTİ_PAİR_GAS_FEE);
+    const transaction = createTransaction(account.address, routerContract.getAddress(), payload, MULTI_PAIR_GAS_FEE);
     await sendTransaction(transaction);
   };
 
