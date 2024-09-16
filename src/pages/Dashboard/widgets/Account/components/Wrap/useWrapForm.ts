@@ -6,6 +6,7 @@ import {
   useGetAccountInfo,
   useGetNetworkConfig
 } from 'lib'; // Adjust import paths accordingly
+import { WRAP_SC } from 'config';
 
 export const useWrapForm = (balance: number, closeModal: () => void) => {
   const { account } = useGetAccountInfo();
@@ -32,8 +33,7 @@ export const useWrapForm = (balance: number, closeModal: () => void) => {
       }
 
       const transaction = prepareTransaction({
-        receiver:
-          'erd1qqqqqqqqqqqqqpgqf5ym43drpsfa6qfyn7w9ztp39czxak9h74nsxh7z4u',
+        receiver: WRAP_SC,
         amount: values.amount,
         gasLimit: '2000000',
         data: 'wrapCnet',

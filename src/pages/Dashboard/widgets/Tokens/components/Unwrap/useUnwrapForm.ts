@@ -6,7 +6,8 @@ import {
   sendTransactions,
   useGetAccountInfo,
   useGetNetworkConfig
-} from 'lib'; // Adjust import paths accordingly
+} from 'lib';
+import { WRAP_SC } from 'config';
 
 const stringToHex = (str: string) => {
   return Buffer.from(str, 'utf8').toString('hex');
@@ -52,7 +53,7 @@ export const useUnwrapForm = (balance: number, closeModal: () => void) => {
       )}@${amountInWei}@${stringToHex('unwrapCnet')}`;
 
       const transaction = prepareTransaction({
-        receiver: 'erd1qqqqqqqqqqqqqpgqf5ym43drpsfa6qfyn7w9ztp39czxak9h74nsxh7z4u', // Typically, token unwrap transactions send to the sender's address
+        receiver: WRAP_SC, // Typically, token unwrap transactions send to the sender's address
         amount: '0', // Token transfer amount is specified in the data field, so this should be 0
         gasLimit: '2000000',
         data: dataField,
