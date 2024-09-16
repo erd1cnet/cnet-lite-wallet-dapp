@@ -35,7 +35,7 @@ export const Header = () => {
           className='flex items-center space-x-1'
         >
           <MultiversXLogo className='h-7' />
-          <div className='flex gap-1 items-center'>
+          <div className='flex gap-1 items-center pl-3'>
             <div className='w-2 h-2 rounded-full bg-green-500' />
             <p className='text-gray-500 text-xs'>{environment}</p>
           </div>
