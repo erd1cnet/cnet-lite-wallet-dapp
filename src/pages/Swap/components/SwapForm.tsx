@@ -3,7 +3,7 @@ import { useFormik } from 'formik';
 import { useSwapTransaction, useSwapForm, useTokenOptions } from '../hooks';
 import { TokenType } from '../types';
 import { useGetPendingTransactions } from 'lib';
-import { ImageWithFallback } from '../components'; 
+import { ImageWithFallback } from '.'; 
 import { renderTokenLabel, getBalanceLabel, getBalanceUSD, getPriceLabel } from '../helpers';
 import { DEFAULT_SVG_URL } from 'config';
 

@@ -15,7 +15,6 @@ import {
   Swap,
   Faucet,
   ListToken,
-  SwapNew 
 } from 'pages';
 import { Send } from 'pages/Send/Send';
 import { Sign } from 'pages/Sign/Sign';
@@ -104,11 +103,6 @@ const routesObject: Record<RouteNamesEnum | HooksPageEnum, RouteWithTitleType> =
     path: RouteNamesEnum.swap,
     title: 'Swap',
     component: Swap
-  },
-  [RouteNamesEnum.swapNew]: {
-    path: RouteNamesEnum.swapNew,
-    title: 'Swap New',
-    component: SwapNew
   },
   [RouteNamesEnum.faucet]: {
     path: RouteNamesEnum.faucet,

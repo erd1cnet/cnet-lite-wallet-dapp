@@ -12,5 +12,5 @@ export * from './Swap';
 export * from './Faucet';
 export * from './ListToken';
 export * from './ListToken/CreatePool';
-export * from './SwapNew';
+export * from './Swap';
 
