@@ -19,7 +19,7 @@ export const Footer = () => {
           href='https://multiversx.com/'
         >
           Made with <HeartIcon className='mx-1 fill-gray-400' /> by the
-          MultiversX team
+          CyberNetwork team
         </a>
         {walletVersion && (
           <span className='text-sm text-gray-400'>
