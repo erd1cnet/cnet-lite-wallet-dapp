@@ -49,7 +49,7 @@ export const useUnwrapForm = (balance: number, closeModal: () => void) => {
         new BigNumber(values.amount).multipliedBy(1e18)
       ); // Convert amount to hexadecimal
       const dataField = `ESDTTransfer@${stringToHex(
-        'WCNET-8e61de'
+        'WCNET-b7a962'
       )}@${amountInWei}@${stringToHex('unwrapCnet')}`;
 
       const transaction = prepareTransaction({

@@ -68,7 +68,7 @@ export const TokenRow = ({ token }: { token: TokenType }) => {
               />
             </div>
           )}
-          {token.identifier === 'WCNET-8e61de' && (
+          {token.identifier === 'WCNET-b7a962' && (
             <button
               className='text-xs text-white rounded bg-blue-600 hover:bg-blue-700 px-2 py-1'
               data-testid={`unwrap-${token.identifier}`}

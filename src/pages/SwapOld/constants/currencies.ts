@@ -12,7 +12,7 @@ const CRYPTO_CURRENCIES: TokenType[] = [
     {
         value: 'wcnet',
         label: 'WCNET',
-        id: 'WCNET-e43344',
+        id: 'WCNET-b7a962',
         decimal: 18,
         name: 'CyberNetwork',
         icon: wcnet,
