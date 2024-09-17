@@ -6,10 +6,14 @@ interface ImageWithFallbackProps {
   className?: string;
 }
 
-const ImageWithFallback: React.FC<ImageWithFallbackProps> = ({ src, alt, className }) => {
+const ImageWithFallback: React.FC<ImageWithFallbackProps> = ({
+  src,
+  alt,
+  className
+}) => {
   const [imageSrc, setImageSrc] = useState(src);
   const [loading, setLoading] = useState(true);
-  const DEFAULT_SVG_URL = '../src/assets/img/default.svg';
+  const DEFAULT_SVG_URL = '/assets/img/default.svg';
 
   useEffect(() => {
     setImageSrc(src);
