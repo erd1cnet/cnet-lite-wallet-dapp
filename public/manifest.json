@@ -1,7 +1,7 @@
 {
-  "name": "MultiversX Lite Wallet dApp",
+  "name": "CyberNetwork Lite Wallet dApp",
   "short_name": "MultiversX dApp",
-  "description": "Easily add or update assets for a Token or NFT Collection on the MultiversX Blockchain",
+  "description": "Easily add or update assets for a Token or NFT Collection on the CyberNetwork Blockchain",
   "icons": [
     {
       "src": "apple-touch-icon.png",
